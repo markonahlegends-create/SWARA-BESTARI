@@ -134,6 +134,18 @@ const SITE = 'Swara Bestari';
             </div>
           </div>
 
+          <div class="panel" id="diag-panel">
+            <div class="panel__h">
+              <h2 class="panel__t">Kesiapan sistem</h2>
+              <button class="panel__link" id="diag-btn">Periksa ulang</button>
+            </div>
+            <div id="diag-body">
+              <p style="color:#8b8272;font-size:.86rem;margin:0">
+                Memeriksa sambungan GitHub…
+              </p>
+            </div>
+          </div>
+
           <div class="panel panel--note">
             <h2 class="panel__t">Cara kerja</h2>
             <p>
@@ -345,10 +357,18 @@ const SITE = 'Swara Bestari';
             </label>
           </div>
 
-          <label class="fld">
-            <span class="fld__label">Gambar</span>
-            <select class="inp" id="f-image"></select>
-          </label>
+          <div class="fld">
+            <span class="fld__label">Gambar utama</span>
+            <div class="imgrow">
+              <select class="inp" id="f-image"></select>
+              <button type="button" class="btn btn--ghost" id="upload-btn">Unggah…</button>
+            </div>
+            <input type="file" id="upload-input" accept="image/*" hidden />
+            <p class="fld__hint" id="upload-note">
+              Unggah foto dari komputer atau ponsel — otomatis dikompres ke maksimal 1600 px.
+            </p>
+            <img id="img-preview" class="imgprev" alt="" />
+          </div>
 
           <label class="fld">
             <span class="fld__label">Teks alternatif gambar</span>
@@ -358,7 +378,7 @@ const SITE = 'Swara Bestari';
           <label class="fld">
             <span class="fld__label">
               Isi tulisan
-              <span class="fld__hint">sebelumai baris dengan “## ” untuk subjudul, “&gt; ” untuk kutipan. Pisahkan paragraf dengan satu baris kosong.</span>
+              <span class="fld__hint">awali baris dengan “## ” untuk subjudul, “&gt; ” untuk kutipan. Pisahkan paragraf dengan satu baris kosong.</span>
             </span>
             <textarea class="inp inp--area inp--mono" rows="22" id="f-body"></textarea>
           </label>
@@ -799,6 +819,18 @@ const SITE = 'Swara Bestari';
       .inp--search { width: 200px; }
       .inp--cell { padding: 0.32rem 0.45rem; font-size: 0.82rem; min-width: 90px; }
       .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.9rem; }
+      .imgrow { display: flex; gap: 0.5rem; }
+      .imgrow .inp { flex: 1; }
+      .imgprev {
+        display: none;
+        margin-top: 0.6rem;
+        width: 100%;
+        max-height: 190px;
+        object-fit: cover;
+        border: 1px solid var(--line);
+        border-radius: 2px;
+      }
+      .imgprev.is-on { display: block; }
 
       /* ══ Laci editor ══ */
       .drawer { position: fixed; inset: 0; z-index: 900; }
@@ -857,6 +889,24 @@ const SITE = 'Swara Bestari';
         color: var(--err);
         font-size: 0.85rem;
       }
+
+      /* ══ Diagnostik ══ */
+      .diag { display: grid; gap: 0.55rem; }
+      .diag__row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        font-size: 0.86rem;
+        padding: 0.5rem 0.65rem;
+        background: #fbf7ee;
+        border-left: 2px solid var(--line);
+        border-radius: 2px;
+      }
+      .diag__row.ok { border-left-color: #2f6b45; background: #f2f8f4; }
+      .diag__row.bad { border-left-color: var(--err); background: #fdf3f2; }
+      .diag__ico { flex: none; font-size: 0.9rem; line-height: 1.4; }
+      .diag__t { font-weight: 500; }
+      .diag__d { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 0.1rem; }
 
       /* ══ Toast ══ */
       .toast {
@@ -1015,7 +1065,65 @@ const SITE = 'Swara Bestari';
           if (e.message.includes('Sesi')) {
             $('#app').hidden = true;
             $('#gate').hidden = false;
-          } else toast(e.message, true);
+          } else {
+            toast(e.message, true);
+            // Tetap tampilkan diagnostik supaya penyebabnya terlihat.
+            runDiagnostics();
+          }
+        }
+      }
+
+      async function runDiagnostics() {
+        const body = $('#diag-body');
+        body.innerHTML = `<div class="diag"><div class="diag__row">
+          <span class="diag__ico">◌</span>
+          <span class="diag__t">Memeriksa sambungan GitHub…</span></div></div>`;
+        try {
+          const r = await api('diagnose');
+          const rows = [];
+
+          rows.push({
+            ok: r.repo?.ok,
+            t: 'Akses repositori',
+            d: r.repo?.ok
+              ? `${r.repo.full_name} · ${r.repo.private ? 'privat' : 'publik'}`
+              : r.repo?.error || 'Gagal memeriksa.',
+          });
+
+          rows.push({
+            ok: r.read?.ok,
+            t: 'Baca berkas konten',
+            d: r.read?.ok
+              ? `articles.json terbaca${r.read.sha ? ` (versi ${r.read.sha})` : ''}.`
+              : r.read?.error || 'Gagal membaca.',
+          });
+
+          rows.push({
+            ok: r.write?.ok,
+            t: 'Izin menulis',
+            d: r.write?.ok
+              ? 'Token boleh menyimpan perubahan. Dashboard siap dipakai.'
+              : r.write?.error || 'Tidak ada izin menulis.',
+          });
+
+          if (r.lastCommit) {
+            rows.push({ ok: true, t: 'Commit terakhir', d: r.lastCommit });
+          }
+
+          body.innerHTML = `<div class="diag">${rows
+            .map(
+              (x) => `<div class="diag__row ${x.ok ? 'ok' : 'bad'}">
+                <span class="diag__ico">${x.ok ? '✓' : '✕'}</span>
+                <span><span class="diag__t">${esc(x.t)}</span>
+                <span class="diag__d">${esc(x.d)}</span></span>
+              </div>`
+            )
+            .join('')}</div>`;
+        } catch (e) {
+          body.innerHTML = `<div class="diag"><div class="diag__row bad">
+            <span class="diag__ico">✕</span>
+            <span><span class="diag__t">Pemeriksaan gagal</span>
+            <span class="diag__d">${esc(e.message)}</span></span></div></div>`;
         }
       }
 
@@ -1031,6 +1139,7 @@ const SITE = 'Swara Bestari';
         renderSettings();
         renderRubrikSelect();
         renderImageSelect();
+        runDiagnostics();
       }
 
       /* ══ Ikhtisar ══ */
@@ -1248,6 +1357,9 @@ const SITE = 'Swara Bestari';
           $('#f-image').value = a.image;
         }
 
+        previewImage(f.image);
+        $('#upload-note').textContent =
+          'Unggah foto dari komputer atau ponsel — otomatis dikompres ke maksimal 1600 px.';
         $('#drawer').hidden = false;
         document.body.style.overflow = 'hidden';
         setTimeout(() => $('#f-title').focus(), 90);
@@ -1328,6 +1440,68 @@ const SITE = 'Swara Bestari';
         } finally {
           btn.disabled = false;
           btn.textContent = 'Simpan & terbitkan';
+        }
+      });
+
+      /* ══ Unggah gambar ══ */
+      function previewImage(src) {
+        const el = $('#img-preview');
+        if (!src) return el.classList.remove('is-on');
+        el.src = src;
+        el.alt = 'Pratinjau gambar utama';
+        el.classList.add('is-on');
+      }
+
+      $('#f-image').addEventListener('change', (e) => previewImage(e.target.value));
+
+      $('#upload-btn').addEventListener('click', () => $('#upload-input').click());
+
+      $('#upload-input').addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const note = $('#upload-note');
+        const btn = $('#upload-btn');
+
+        btn.disabled = true;
+        note.textContent = 'Mengompres & mengunggah…';
+
+        try {
+          // Baca berkas jadi data URL di sisi klien.
+          const dataUrl = await new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(r.result);
+            r.onerror = reject;
+            r.readAsDataURL(file);
+          });
+
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: file.name, dataUrl }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Unggah gagal.');
+
+          // Sisipkan sebagai opsi terpilih.
+          const opt = document.createElement('option');
+          opt.value = data.path;
+          opt.textContent = `${data.path.split('/').pop()} · ${data.width}×${data.height}`;
+          $('#f-image').appendChild(opt);
+          $('#f-image').value = data.path;
+          previewImage(data.path);
+
+          const saved = data.originalBytes && data.originalBytes > data.bytes
+            ? ` (dari ${Math.round(data.originalBytes / 1024)} KB → ${Math.round(data.bytes / 1024)} KB)`
+            : '';
+          note.textContent = `Terunggah${saved}. Gambar masuk ke repo dan tayang setelah situs dibangun ulang.`;
+          toast('Gambar terunggah.');
+        } catch (ex) {
+          note.textContent = 'Gagal mengunggah. Coba berkas lain.';
+          toast(ex.message, true);
+        } finally {
+          btn.disabled = false;
+          e.target.value = '';
         }
       });
 
@@ -1534,6 +1708,10 @@ const SITE = 'Swara Bestari';
       });
 
       /* ══ Terbitkan ulang ══ */
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('#diag-btn')) runDiagnostics();
+      });
+
       $('#publish-btn').addEventListener('click', async () => {
         const btn = $('#publish-btn');
         btn.disabled = true;
