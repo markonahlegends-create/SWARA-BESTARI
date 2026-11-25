@@ -3,6 +3,11 @@ import Base from '../layouts/Base.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { adPackages, audience, adFormats, adSlots } from '../data/ads.js';
 import { site } from '../data/site.js';
+
+// Berkas PDF dibuat oleh `npm run pdf` (scripts/build-pdf.mjs) dan
+// disimpan statis di public/unduhan — tidak dibuat ulang tiap build.
+const PDF_MEDIA_KIT = '/unduhan/media-kit-swara-bestari.pdf';
+const proposalPdf = (nama) => `/unduhan/proposal-${nama.toLowerCase()}.pdf`;
 ---
 
 <Base
@@ -24,13 +29,19 @@ import { site } from '../data/site.js';
         di sinilah ruangnya.
       </p>
       <div class="ikh__actions">
-        <a href={`mailto:${site.email}?subject=Permintaan Media Kit Swara Bestari`} class="btn btn--gold">
+        <a href={PDF_MEDIA_KIT} download class="btn btn--gold">
           Unduh media kit <span class="btn__arrow">↓</span>
+        </a>
+        <a href={proposalPdf('Candra')} download class="btn btn--light">
+          Unduh proposal kerjasama <span class="btn__arrow">↓</span>
         </a>
         <a href={site.whatsapp} target="_blank" rel="noopener" class="btn btn--light">
           WhatsApp tim iklan <span class="btn__arrow">↗</span>
         </a>
       </div>
+      <p class="ikh__note">
+        Media kit 8 halaman · Proposal 7 halaman · PDF, siap dibagikan ke tim Anda
+      </p>
     </div>
     <div class="ikh__mark" aria-hidden="true">MEDIA KIT</div>
   </header>
@@ -85,10 +96,17 @@ import { site } from '../data/site.js';
               ))}
             </ul>
             <a
-              href={`mailto:${site.email}?subject=Paket ${p.name} — Swara Bestari`}
+              href={proposalPdf(p.name)}
+              download
               class:list={['pk__cta', { 'pk__cta--gold': p.featured }]}
             >
-              Ajukan paket {p.name} <span>→</span>
+              Unduh proposal {p.name} <span>↓</span>
+            </a>
+            <a
+              href={`mailto:${site.email}?subject=Paket ${p.name} — Swara Bestari`}
+              class="pk__ask"
+            >
+              atau ajukan lewat surel
             </a>
           </article>
         ))}
@@ -344,6 +362,15 @@ import { site } from '../data/site.js';
     padding-block: 1rem 1.25rem;
   }
 
+  .ikh__note {
+    margin-top: 18px;
+    font-family: var(--f-sans);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(244, 239, 228, 0.5);
+  }
+
   /* ── paket ── */
   .pk__head { max-width: 60ch; margin-bottom: clamp(2rem, 4vw, 3rem); }
   .pk__title {
@@ -360,6 +387,22 @@ import { site } from '../data/site.js';
     gap: clamp(1rem, 2vw, 1.75rem);
     align-items: stretch;
   }
+  .pk__ask {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    font-family: var(--f-sans);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .pk__ask:hover { color: var(--gold-700); }
+  .pk__card--feature .pk__ask { color: rgba(244, 239, 228, 0.5); }
+  .pk__card--feature .pk__ask:hover { color: var(--gold-200); }
+
   .pk__card {
     position: relative;
     border: 1px solid var(--line);

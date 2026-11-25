@@ -406,6 +406,12 @@ const SITE = 'Swara Bestari';
     <style>
       /* ══ Dasar ══ */
       .adm {
+        /* Halaman admin tidak memakai masthead situs, jadi warisan
+           padding-top body (ruang untuk header fixed) harus dinolkan.
+           Tanpa ini muncul pita kosong setinggi ±208px di atas layar. */
+        padding-top: 0 !important;
+        min-height: 100vh;
+
         --ink: #14120f;
         --ink-soft: #3d3830;
         --muted: #6b6152;
@@ -699,9 +705,12 @@ const SITE = 'Swara Bestari';
       .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
       .mini-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        /* 240px agar placeholder panjang tidak terpotong di tengah kata. */
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 1rem;
       }
+      /* Field deskripsi butuh lebar penuh — isinya kalimat panjang. */
+      .mini-grid .fld--wide { grid-column: 1 / -1; }
 
       /* ══ Grafik ══ */
       .spark { display: flex; align-items: flex-end; gap: 4px; height: 120px; }
