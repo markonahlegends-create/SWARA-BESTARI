@@ -1,0 +1,111 @@
+---
+// Bilah manifesto — penegasan identitas di tengah halaman beranda.
+---
+<section class="mf">
+  <div class="wrap mf__inner">
+    <span class="mf__side">Manifesto — 01</span>
+    <div class="mf__body">
+      <p class="mf__line" data-reveal>
+        Kami tidak mengejar yang <em>tercepat</em>.
+      </p>
+      <p class="mf__line" data-reveal style="--d:.1s">
+        Kami mengejar yang <em>paling jujur</em>.
+      </p>
+      <p class="mf__note" data-reveal style="--d:.2s">
+        Swara Bestari menolak gagasan bahwa kebudayaan harus ringkas agar layak
+        dibaca. Setiap tulisan di sini diberi ruang untuk bernapas—dan setiap
+        pembaca diberi waktu untuk tinggal.
+      </p>
+    </div>
+    <span class="mf__seal" aria-hidden="true">
+      <svg viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="47" stroke="currentColor" stroke-width="0.7" opacity="0.4"/>
+        <circle cx="50" cy="50" r="38" stroke="currentColor" stroke-width="0.7" opacity="0.25"/>
+        <path id="circ" d="M50 12a38 38 0 1 1 0 76a38 38 0 1 1 0-76" fill="none"/>
+        <text fill="currentColor" font-size="7.2" letter-spacing="2.1" font-family="Jost, sans-serif">
+          <textPath href="#circ">SWARA BESTARI · SUARA YANG MENJAGA INGATAN ·</textPath>
+        </text>
+        <path d="M50 34c-6 5-10 9-10 14a10 10 0 0 0 20 0c0-5-4-9-10-14z" stroke="currentColor" stroke-width="0.9" opacity="0.7"/>
+      </svg>
+    </span>
+  </div>
+</section>
+
+<style>
+  .mf {
+    background: var(--ink);
+    color: var(--paper);
+    padding-block: clamp(3.25rem, 7vw, 6rem);
+    position: relative;
+    overflow: hidden;
+  }
+  .mf::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent calc(25% - 1px),
+      rgba(208, 175, 98, 0.07) calc(25% - 1px),
+      rgba(208, 175, 98, 0.07) 25%
+    );
+    pointer-events: none;
+  }
+  .mf__inner {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr) 160px;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+    position: relative;
+  }
+  .mf__side {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-200);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    justify-self: start;
+  }
+  .mf__line {
+    font-family: var(--serif-display);
+    font-size: clamp(1.85rem, 4.4vw, 3.4rem);
+    font-weight: 400;
+    line-height: 1.14;
+    letter-spacing: -0.025em;
+  }
+  .mf__line em {
+    font-style: italic;
+    color: var(--gold-200);
+  }
+  .mf__note {
+    margin-top: clamp(1.25rem, 2.5vw, 2rem);
+    max-width: 58ch;
+    font-size: 0.96rem;
+    line-height: 1.75;
+    color: rgba(244, 239, 228, 0.52);
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line-dark);
+  }
+  .mf__seal {
+    display: block;
+    width: 100%;
+    max-width: 160px;
+    color: var(--gold-200);
+    justify-self: end;
+  }
+  .mf__seal svg {
+    width: 100%;
+    height: auto;
+    animation: spin 48s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 900px) {
+    .mf__inner { grid-template-columns: 1fr; gap: 1.5rem; }
+    .mf__side { writing-mode: horizontal-tb; transform: none; }
+    .mf__seal { display: none; }
+  }
+</style>

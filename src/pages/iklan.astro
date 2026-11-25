@@ -1,0 +1,625 @@
+---
+import Base from '../layouts/Base.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { adPackages, audience, adFormats, adSlots } from '../data/ads.js';
+import { site } from '../data/site.js';
+---
+
+<Base
+  title="Ruang Iklan"
+  description="Media kit Swara Bestari — sembilan format iklan, paket kemitraan, dan data audiens."
+>
+  <!-- ═════════ MASTHEAD IKLAN ═════════ -->
+  <header class="ikh">
+    <div class="wrap">
+      <span class="eyebrow eyebrow--light">Media Kit 2026</span>
+      <h1 class="ikh__title">
+        Berbicara pada pembaca<br />
+        yang <em>memilih</em> untuk membaca.
+      </h1>
+      <p class="ikh__desc">
+        Swara Bestari dibaca oleh mereka yang menyisihkan waktu—bukan mereka yang
+        menggulir tanpa arah. Jika merek Anda ingin hadir dalam perhatian yang utuh,
+        di sinilah ruangnya.
+      </p>
+      <div class="ikh__actions">
+        <a href={`mailto:${site.email}?subject=Permintaan Media Kit Swara Bestari`} class="btn btn--gold">
+          Unduh media kit <span class="btn__arrow">↓</span>
+        </a>
+        <a href={site.whatsapp} target="_blank" rel="noopener" class="btn btn--light">
+          WhatsApp tim iklan <span class="btn__arrow">↗</span>
+        </a>
+      </div>
+    </div>
+    <div class="ikh__mark" aria-hidden="true">MEDIA KIT</div>
+  </header>
+
+  <!-- ═════════ AUDIENS ═════════ -->
+  <section class="auc">
+    <div class="wrap">
+      <div class="auc__grid">
+        {audience.map((a, i) => (
+          <div class="auc__stat" data-reveal style={`--d:${i * 0.08}s`}>
+            <span class="auc__val">{a.value}</span>
+            <span class="auc__label">{a.label}</span>
+            <span class="auc__note">{a.note}</span>
+          </div>
+        ))}
+      </div>
+      <p class="auc__source">
+        Sumber: Google Analytics 4 & survei pembaca, rata-rata Januari–Oktober 2026.
+        Data lengkap tersedia dalam media kit.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═════════ PAKET ═════════ -->
+  <section class="section pk">
+    <div class="wrap">
+      <div class="pk__head">
+        <span class="eyebrow">Paket Kemitraan</span>
+        <h2 class="pk__title">Tiga cara untuk hadir</h2>
+        <p class="pk__desc">
+          Semua paket dapat disesuaikan. Kami tidak menempatkan iklan yang menyerupai
+          tulisan redaksi—dan kami selalu memberi label pada apa pun yang dibayar.
+        </p>
+      </div>
+      <div class="pk__grid">
+        {adPackages.map((p) => (
+          <article class:list={['pk__card', { 'pk__card--feature': p.featured }]}>
+            {p.featured && <span class="pk__ribbon">Paling Diminta</span>}
+            <span class="pk__tier">{p.tier}</span>
+            <h3 class="pk__name">{p.name}</h3>
+            <div class="pk__price">
+              <span class="pk__amount">{p.price}</span>
+              <span class="pk__period">{p.period}</span>
+            </div>
+            <p class="pk__pdesc">{p.desc}</p>
+            <ul class="pk__list">
+              {p.items.map((it) => (
+                <li>
+                  <span class="pk__tick" aria-hidden="true">✦</span>
+                  {it}
+                </li>
+              ))}
+            </ul>
+            <a
+              href={`mailto:${site.email}?subject=Paket ${p.name} — Swara Bestari`}
+              class:list={['pk__cta', { 'pk__cta--gold': p.featured }]}
+            >
+              Ajukan paket {p.name} <span>→</span>
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ FORMAT ═════════ -->
+  <section class="section fm">
+    <div class="wrap">
+      <div class="fk__head">
+        <span class="eyebrow">Ragam Format</span>
+        <h2 class="fm__title">Sembilan slot, satu tata letak yang tenang</h2>
+      </div>
+      <div class="fm__table">
+        <div class="fm__tr fm__tr--head">
+          <span>Format</span>
+          <span>Ukuran</span>
+          <span>Penempatan</span>
+        </div>
+        {adFormats.map((f) => (
+          <div class="fm__tr">
+            <span class="fm__name">{f.name}</span>
+            <span class="fm__size">{f.size}</span>
+            <span class="fm__place">{f.placement}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ CONTOH SLOT ═════════ -->
+  <section class="section demo">
+    <div class="wrap">
+      <span class="eyebrow">Pratinjau Slot</span>
+      <h2 class="demo__title">Bagaimana iklan menyatu dengan halaman</h2>
+      <p class="demo__desc">
+        Setiap slot dirancang agar tidak memutus ritme baca. Placeholder di bawah
+        menunjukkan ukuran dan posisi sebenarnya.
+      </p>
+
+      <div class="demo__band">
+        <span class="demo__tag">Billboard · di bawah masthead</span>
+        <AdSlot format="billboard" />
+      </div>
+
+      <div class="demo__split">
+        <div class="demo__col">
+          <span class="demo__tag">Leaderboard · di antara blok artikel</span>
+          <AdSlot format="leaderboard" />
+          <span class="demo__tag">Native · Mata Surat</span>
+          <AdSlot format="native" label="Mata Surat" />
+        </div>
+        <div class="demo__col demo__col--rail">
+          <span class="demo__tag">Half page · sidebar</span>
+          <AdSlot format="halfpage" />
+        </div>
+      </div>
+
+      <div class="demo__three">
+        <div>
+          <span class="demo__tag">Square · 300×250</span>
+          <AdSlot format="square" />
+        </div>
+        <div>
+          <span class="demo__tag">Compact · grid kanal</span>
+          <AdSlot format="compact" />
+        </div>
+        <div>
+          <span class="demo__tag">Skyscraper · artikel</span>
+          <AdSlot format="skyscraper" />
+        </div>
+      </div>
+
+      <div class="demo__band">
+        <span class="demo__tag">Strip · sebelum footer</span>
+        <AdSlot format="strip" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ PRINSIP ═════════ -->
+  <section class="pr">
+    <div class="wrap pr__inner">
+      <div class="pr__col">
+        <span class="eyebrow eyebrow--light">Prinsip Kami</span>
+        <h2 class="pr__title">
+          Iklan yang jujur<br /><em>lebih bertahan lama.</em>
+        </h2>
+      </div>
+      <div class="pr__list">
+        <div class="pr__item">
+          <span class="pr__num">01</span>
+          <div>
+            <h3>Label yang jelas</h3>
+            <p>Setiap konten berbayar ditandai. Tidak ada advertorial yang menyamar sebagai berita.</p>
+          </div>
+        </div>
+        <div class="pr__item">
+          <span class="pr__num">02</span>
+          <div>
+            <h3>Tanpa gangguan baca</h3>
+            <p>Tidak ada pop-up, tidak ada autoplay bersuara, tidak ada penghalang konten.</p>
+          </div>
+        </div>
+        <div class="pr__item">
+          <span class="pr__num">03</span>
+          <div>
+            <h3>Redaksi tetap merdeka</h3>
+            <p>Mitra tidak memiliki hak menyetujui isi tulisan redaksi, kecuali pada slot Mata Surat.</p>
+          </div>
+        </div>
+        <div class="pr__item">
+          <span class="pr__num">04</span>
+          <div>
+            <h3>Data yang terbuka</h3>
+            <p>Laporan impresi, klik, dan durasi tayang dikirim tiap minggu. Tanpa penyesuaian angka.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ KONTAK ═════════ -->
+  <section class="section ctakt">
+    <div class="wrap ctakt__inner">
+      <div class="ctakt__text">
+        <span class="eyebrow">Mulai Percakapan</span>
+        <h2 class="ctakt__title">Mari bicarakan<br /><em>penempatan yang tepat.</em></h2>
+        <p>
+          Tim kami akan membantu memilih format dan jadwal yang sesuai dengan
+          kampanye Anda—tanpa tekanan, tanpa kontrak panjang di awal.
+        </p>
+      </div>
+      <div class="ctakt__card">
+        <div class="ctakt__row">
+          <span class="ctakt__label">WhatsApp / Telepon</span>
+          <a class="ctakt__val" href={site.whatsapp} target="_blank" rel="noopener">{site.phone}</a>
+        </div>
+        <div class="ctakt__row">
+          <span class="ctakt__label">Surel iklan</span>
+          <a class="ctakt__val" href={`mailto:iklan@swarabestari.id`}>iklan@swarabestari.id</a>
+        </div>
+        <div class="ctakt__row">
+          <span class="ctakt__label">Sekretariat</span>
+          <span class="ctakt__val ctakt__val--muted">{site.address}</span>
+        </div>
+        <div class="ctakt__row">
+          <span class="ctakt__label">Jam kerja</span>
+          <span class="ctakt__val ctakt__val--muted">Senin–Jumat, 09.00–17.00 WIB</span>
+        </div>
+        <a href={site.whatsapp} target="_blank" rel="noopener" class="btn btn--gold ctakt__btn">
+          Hubungi tim iklan <span class="btn__arrow">↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ── masthead ── */
+  .ikh {
+    position: relative;
+    background: var(--ink);
+    color: var(--paper);
+    padding-block: clamp(2.75rem, 6vw, 5.5rem) clamp(2rem, 4vw, 3rem);
+    overflow: hidden;
+  }
+  .ikh::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: 0;
+    width: 55vw;
+    height: 55vw;
+    background: radial-gradient(circle, rgba(208, 175, 98, 0.13), transparent 62%);
+    pointer-events: none;
+  }
+  .ikh .wrap { position: relative; z-index: 2; }
+  .ikh__title {
+    font-family: var(--serif-display);
+    font-size: clamp(2.3rem, 5.6vw, 4.4rem);
+    font-weight: 500;
+    line-height: 1.0;
+    letter-spacing: -0.028em;
+    margin-block: 1rem 1.4rem;
+    max-width: 22ch;
+  }
+  .ikh__title em { font-style: italic; color: var(--gold-200); }
+  .ikh__desc {
+    font-size: clamp(0.98rem, 1.3vw, 1.12rem);
+    line-height: 1.7;
+    color: rgba(244, 239, 228, 0.6);
+    max-width: 58ch;
+  }
+  .ikh__actions { display: flex; flex-wrap: wrap; gap: 0.85rem; margin-top: 2rem; }
+  .ikh__mark {
+    font-family: var(--serif-display);
+    font-size: clamp(3.5rem, 13vw, 12rem);
+    line-height: 0.7;
+    letter-spacing: 0.03em;
+    text-align: center;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(208, 175, 98, 0.15);
+    white-space: nowrap;
+    transform: translateY(30%);
+    user-select: none;
+  }
+
+  /* ── audiens ── */
+  .auc { background: var(--paper-2); border-bottom: 1px solid var(--line); }
+  .auc__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-top: 2.5rem;
+  }
+  .auc__stat {
+    background: var(--paper);
+    padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 2vw, 1.75rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .auc__val {
+    font-family: var(--serif-display);
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .auc__label {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-top: 0.35rem;
+  }
+  .auc__note {
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--muted-2);
+  }
+  .auc__source {
+    font-family: var(--sans);
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+    color: var(--muted-2);
+    padding-block: 1rem 1.25rem;
+  }
+
+  /* ── paket ── */
+  .pk__head { max-width: 60ch; margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .pk__title {
+    font-family: var(--serif-display);
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    font-weight: 400;
+    letter-spacing: -0.022em;
+    margin-block: 0.7rem 0.9rem;
+  }
+  .pk__desc { color: var(--muted); font-size: 1rem; line-height: 1.7; }
+  .pk__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1rem, 2vw, 1.75rem);
+    align-items: stretch;
+  }
+  .pk__card {
+    position: relative;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: clamp(1.6rem, 3vw, 2.4rem);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.5s var(--ease-out), box-shadow 0.5s var(--ease), border-color 0.4s;
+  }
+  .pk__card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--gold); }
+  .pk__card--feature {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--gold-600);
+  }
+  .pk__ribbon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--gold-600);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 0.5rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.5rem 0.9rem;
+  }
+  .pk__tier {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+  }
+  .pk__card--feature .pk__tier { color: var(--gold-200); }
+  .pk__name {
+    font-family: var(--serif-display);
+    font-size: clamp(1.7rem, 2.6vw, 2.2rem);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    margin-block: 0.4rem 0.9rem;
+  }
+  .pk__price { display: flex; align-items: baseline; gap: 0.4rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+  .pk__card--feature .pk__price { border-color: var(--line-dark); }
+  .pk__amount {
+    font-family: var(--serif-display);
+    font-size: clamp(1.5rem, 2.4vw, 1.95rem);
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .pk__card--feature .pk__amount { color: var(--gold-200); }
+  .pk__period { font-family: var(--sans); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--muted-2); }
+  .pk__pdesc { font-size: 0.9rem; line-height: 1.6; color: var(--muted); margin-block: 1rem 1.25rem; }
+  .pk__card--feature .pk__pdesc { color: rgba(244, 239, 228, 0.55); }
+  .pk__list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.75rem; flex: 1; }
+  .pk__list li {
+    display: flex;
+    gap: 0.65rem;
+    font-size: 0.87rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    align-items: flex-start;
+  }
+  .pk__card--feature .pk__list li { color: rgba(244, 239, 228, 0.78); }
+  .pk__tick { color: var(--gold-600); font-size: 0.7rem; line-height: 1.9; flex: none; }
+  .pk__card--feature .pk__tick { color: var(--gold-200); }
+  .pk__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9em 1.2em;
+    border: 1px solid var(--ink);
+    font-family: var(--sans);
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    transition: background 0.35s, color 0.35s, border-color 0.35s;
+  }
+  .pk__cta span { transition: transform 0.4s var(--ease-out); }
+  .pk__cta:hover { background: var(--ink); color: var(--paper); }
+  .pk__cta:hover span { transform: translateX(4px); }
+  .pk__cta--gold { border-color: var(--gold-600); background: var(--gold-600); color: var(--ink); }
+  .pk__cta--gold:hover { background: var(--gold-200); border-color: var(--gold-200); color: var(--ink); }
+
+  /* ── format ── */
+  .fm { background: var(--paper-2); border-block: 1px solid var(--line); }
+  .fm__title {
+    font-family: var(--serif-display);
+    font-size: clamp(1.9rem, 3.6vw, 2.8rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-block: 0.65rem 2rem;
+    max-width: 26ch;
+  }
+  .fk__head { max-width: 60ch; }
+  .fm__table { border-top: 1px solid var(--ink); }
+  .fm__tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.6fr;
+    gap: 1.5rem;
+    padding-block: 0.95rem;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.9rem;
+    align-items: baseline;
+  }
+  .fm__tr--head {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    padding-block: 0.7rem;
+  }
+  .fm__name { font-family: var(--serif-display); font-size: 1.1rem; color: var(--ink); }
+  .fm__size { font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--gold-700); }
+  .fm__place { color: var(--muted); font-size: 0.86rem; }
+
+  /* ── demo ── */
+  .demo__title {
+    font-family: var(--serif-display);
+    font-size: clamp(1.9rem, 3.6vw, 2.8rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-block: 0.65rem 0.7rem;
+  }
+  .demo__desc { color: var(--muted); max-width: 60ch; margin-bottom: 2.5rem; }
+  .demo__band { margin-bottom: 2.5rem; }
+  .demo__tag {
+    display: block;
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    margin-bottom: 1rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line-soft);
+  }
+  .demo__split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: clamp(1.5rem, 3.5vw, 3rem);
+    margin-bottom: 1rem;
+    align-items: start;
+  }
+  .demo__col { display: flex; flex-direction: column; }
+  .demo__col .ad + .demo__tag { margin-top: 1.5rem; }
+  .demo__col--rail { justify-self: end; width: 100%; max-width: 300px; }
+  .demo__three {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1rem, 2.5vw, 2rem);
+    margin-top: 1.5rem;
+  }
+
+  /* ── prinsip ── */
+  .pr { background: var(--ink); color: var(--paper); padding-block: clamp(3rem, 6vw, 5rem); }
+  .pr__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  .pr__title {
+    font-family: var(--serif-display);
+    font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin-top: 0.8rem;
+  }
+  .pr__title em { color: var(--gold-200); }
+  .pr__list { display: flex; flex-direction: column; }
+  .pr__item {
+    display: flex;
+    gap: 1.25rem;
+    padding-block: 1.25rem;
+    border-top: 1px solid var(--line-dark);
+    align-items: flex-start;
+  }
+  .pr__num {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--gold-200);
+    padding-top: 0.15rem;
+    flex: none;
+  }
+  .pr__item h3 {
+    font-family: var(--serif-display);
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+  }
+  .pr__item p {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: rgba(244, 239, 228, 0.55);
+    max-width: 52ch;
+  }
+
+  /* ── kontak ── */
+  .ctakt { background: var(--paper-2); }
+  .ctakt__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  .ctakt__title {
+    font-family: var(--serif-display);
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.022em;
+    margin-block: 0.75rem 1rem;
+  }
+  .ctakt__title em { color: var(--gold-700); }
+  .ctakt__text p { color: var(--muted); max-width: 46ch; line-height: 1.7; }
+  .ctakt__card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: clamp(1.5rem, 3vw, 2.4rem);
+  }
+  .ctakt__row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-block: 0.95rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .ctakt__label {
+    font-family: var(--sans);
+    font-size: 0.54rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+  .ctakt__val {
+    font-family: var(--serif-display);
+    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+    color: var(--ink);
+    transition: color 0.3s;
+  }
+  a.ctakt__val:hover { color: var(--gold-700); }
+  .ctakt__val--muted { font-size: 0.95rem; color: var(--muted); }
+  .ctakt__btn { margin-top: 1.5rem; width: 100%; justify-content: center; }
+
+  @media (max-width: 980px) {
+    .auc__grid { grid-template-columns: 1fr 1fr; }
+    .pk__grid, .demo__three, .pr__inner, .ctakt__inner { grid-template-columns: 1fr; }
+    .demo__split { grid-template-columns: 1fr; }
+    .demo__col--rail { justify-self: start; }
+    .fm__tr { grid-template-columns: 1fr 1fr; }
+    .fm__place { display: none; }
+  }
+  @media (max-width: 560px) {
+    .auc__grid { grid-template-columns: 1fr; }
+  }
+</style>

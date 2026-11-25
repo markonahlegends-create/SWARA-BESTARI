@@ -1,0 +1,90 @@
+---
+// Daftar bacaan panjang — untuk pembaca yang ingin tenggelam.
+import { articles } from '../data/articles.js';
+const longform = [...articles].sort((a, b) => b.reading - a.reading).slice(0, 4);
+---
+<section class="rl" aria-labelledby="rl-title">
+  <span class="rl__eyebrow">Untuk Waktu Luang</span>
+  <h2 class="rl__title" id="rl-title">Bacaan <em>Panjang</em></h2>
+  <p class="rl__desc">Tulisan yang menuntut duduk lebih lama. Simpan untuk akhir pekan.</p>
+  <ul class="rl__list">
+    {longform.map((a) => (
+      <li>
+        <a href={`/tulisan/${a.slug}`} class="rl__item">
+          <span class="rl__time">{a.reading}<small>mnt</small></span>
+          <span class="rl__body">
+            <span class="rl__text">{a.title}</span>
+            <span class="rl__author">{a.author}</span>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .rl { padding-top: 0.25rem; }
+  .rl__eyebrow {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+  }
+  .rl__title {
+    font-family: var(--serif-display);
+    font-size: 1.7rem;
+    font-weight: 400;
+    margin-block: 0.5rem 0.6rem;
+    letter-spacing: -0.015em;
+  }
+  .rl__title em { color: var(--gold-700); }
+  .rl__desc {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+    max-width: 32ch;
+  }
+  .rl__list { list-style: none; padding: 0; }
+  .rl__item {
+    display: flex;
+    gap: 1rem;
+    padding-block: 0.9rem;
+    border-top: 1px solid var(--line);
+    align-items: baseline;
+  }
+  .rl__time {
+    font-family: var(--serif-display);
+    font-size: 1.45rem;
+    line-height: 1;
+    color: var(--gold-600);
+    display: flex;
+    align-items: baseline;
+    gap: 0.15rem;
+    flex: none;
+    width: 3.1rem;
+  }
+  .rl__time small {
+    font-family: var(--sans);
+    font-size: 0.48rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+  .rl__body { display: flex; flex-direction: column; gap: 0.15rem; }
+  .rl__text {
+    font-family: var(--serif-display);
+    font-size: 1rem;
+    line-height: 1.22;
+    transition: color 0.3s;
+  }
+  .rl__item:hover .rl__text { color: var(--gold-700); }
+  .rl__author {
+    font-family: var(--sans);
+    font-size: 0.53rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+</style>

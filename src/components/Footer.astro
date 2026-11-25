@@ -1,0 +1,266 @@
+---
+import { site, nav, rubrik } from '../data/site.js';
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="foot__cta">
+    <div class="wrap foot__cta-inner">
+      <div class="foot__cta-text">
+        <span class="eyebrow eyebrow--light">Surat Swara</span>
+        <h2 class="foot__cta-title">
+          Satu surat, setiap Jumat.<br />
+          <em>Yang layak Anda baca pelan-pelan.</em>
+        </h2>
+      </div>
+      <form class="foot__form" id="footer-newsletter" novalidate>
+        <label class="sr-only" for="foot-email">Alamat surel</label>
+        <input id="foot-email" type="email" name="email" placeholder="alamat surel Anda" required autocomplete="email" />
+        <button type="submit" class="btn btn--gold">
+          Berlangganan <span class="btn__arrow">→</span>
+        </button>
+        <p class="foot__form-note" id="foot-note">
+          Gratis. Tanpa iklan berselubung. Berhenti kapan saja.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div class="wrap foot__main">
+    <div class="foot__brand">
+      <img src="/logo-gold.png" alt="Swara Bestari" width="86" height="96" />
+      <p class="foot__tagline">{site.tagline}</p>
+      <p class="foot__desc">{site.description}</p>
+    </div>
+
+    <div class="foot__col">
+      <h3 class="foot__head">Rubrik</h3>
+      <ul>
+        {rubrik.map((r) => (
+          <li><a href={`/rubrik/${r.slug}`} class="ln">{r.name}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="foot__col">
+      <h3 class="foot__head">Redaksi</h3>
+      <ul>
+        <li><a href="/tentang" class="ln">Tentang Kami</a></li>
+        <li><a href="/iklan" class="ln">Ruang Iklan</a></li>
+        <li><a href="/tentang#pedoman" class="ln">Pedoman Media</a></li>
+        <li><a href="/tentang#kontak" class="ln">Kontak & Redaksi</a></li>
+        <li><a href="/arsip" class="ln">Arsip</a></li>
+        <li><a href="/ruang-baca" class="ln">Ruang Baca</a></li>
+        <li><a href="/podcast" class="ln">Podcast</a></li>
+      </ul>
+    </div>
+
+    <div class="foot__col foot__col--contact">
+      <h3 class="foot__head">Hubungi</h3>
+      <a class="foot__phone" href={`tel:${site.phoneHref}`}>{site.phone}</a>
+      <a class="foot__mail ln" href={`mailto:${site.email}`}>{site.email}</a>
+      <a class="foot__wa btn btn--light" href={site.whatsapp} target="_blank" rel="noopener">
+        WhatsApp Redaksi <span class="btn__arrow">↗</span>
+      </a>
+      <p class="foot__addr">{site.address}</p>
+    </div>
+  </div>
+
+  <div class="wrap foot__bottom">
+    <span>© {year} {site.name}. Seluruh hak cipta dilindungi.</span>
+    <span class="foot__issn">ISSN {site.issn}</span>
+    <div class="foot__legal">
+      <a href="/tentang#privasi" class="ln">Kebijakan Privasi</a>
+      <a href="/tentang#pedoman" class="ln">Pedoman</a>
+      <a href="/iklan" class="ln">Media Kit</a>
+    </div>
+  </div>
+
+  <div class="foot__mark" aria-hidden="true">
+    <span>SWARA BESTARI</span>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+  /* ── newsletter band ── */
+  .foot__cta {
+    border-bottom: 1px solid var(--line-dark);
+    background:
+      radial-gradient(ellipse 80% 120% at 15% 0%, rgba(208, 175, 98, 0.14), transparent 60%),
+      var(--ink-2);
+  }
+  .foot__cta-inner {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 5vw, 4.25rem);
+  }
+  .foot__cta-title {
+    font-family: var(--serif-display);
+    font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+    font-weight: 400;
+    line-height: 1.15;
+    margin-top: 0.85rem;
+    letter-spacing: -0.01em;
+  }
+  .foot__cta-title em {
+    color: var(--gold-200);
+    font-style: italic;
+  }
+  .foot__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: stretch;
+    position: relative;
+  }
+  .foot__form input {
+    flex: 1 1 220px;
+    min-width: 0;
+    background: transparent;
+    border: 1px solid var(--line-dark);
+    color: var(--paper);
+    padding: 0.85em 1.1em;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    transition: border-color 0.3s var(--ease);
+  }
+  .foot__form input::placeholder { color: rgba(244, 239, 228, 0.46); }
+  .foot__form input:focus { outline: none; border-color: var(--gold); }
+  .foot__form-note {
+    flex-basis: 100%;
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: rgba(244, 239, 228, 0.46);
+    margin-top: 0.35rem;
+  }
+  .foot__form-note.is-ok { color: var(--gold-200); }
+  .foot__form-note.is-err { color: #d98b74; }
+
+  /* ── main ── */
+  .foot__main {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+    gap: clamp(1.5rem, 3.5vw, 3.5rem);
+    padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(2rem, 4vw, 3rem);
+  }
+  .foot__brand img {
+    width: 86px;
+    height: auto;
+    opacity: 0.94;
+    margin-bottom: 1rem;
+  }
+  .foot__tagline {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--gold-200);
+  }
+  .foot__desc {
+    margin-top: 0.9rem;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: rgba(244, 239, 228, 0.55);
+    max-width: 34ch;
+  }
+  .foot__head {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(244, 239, 228, 0.46);
+    margin-bottom: 1.1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--line-dark);
+  }
+  .foot__col ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+  .foot__col a {
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    color: rgba(244, 239, 228, 0.72);
+    transition: color 0.3s var(--ease);
+  }
+  .foot__col a:hover { color: var(--gold-200); }
+
+  .foot__col--contact { display: flex; flex-direction: column; align-items: flex-start; gap: 0.85rem; }
+  .foot__col--contact .foot__head { align-self: stretch; }
+  .foot__phone {
+    font-family: var(--serif-display);
+    font-size: 1.3rem;
+    letter-spacing: 0.02em;
+    color: var(--paper) !important;
+  }
+  .foot__mail {
+    font-family: var(--sans) !important;
+    font-size: 0.8rem !important;
+    color: var(--gold-200) !important;
+  }
+  .foot__wa { font-size: 0.65rem !important; padding: 0.7em 1.2em 0.65em; }
+  .foot__addr {
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    color: rgba(244, 239, 228, 0.46);
+  }
+
+  /* ── bottom ── */
+  .foot__bottom {
+    border-top: 1px solid var(--line-dark);
+    padding-block: 1.6rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 2rem;
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(244, 239, 228, 0.46);
+  }
+  .foot__issn { color: rgba(244, 239, 228, 0.46); }
+  .foot__legal { margin-left: auto; display: flex; gap: 1.5rem; }
+  .foot__legal a { color: rgba(244, 239, 228, 0.5); transition: color 0.3s; }
+  .foot__legal a:hover { color: var(--gold-200); }
+
+  /* ── giant wordmark ── */
+  .foot__mark {
+    border-top: 1px solid var(--line-dark);
+    overflow: hidden;
+    padding-top: 1rem;
+    text-align: center;
+  }
+  .foot__mark span {
+    display: block;
+    font-family: var(--serif-display);
+    font-size: clamp(2.2rem, 12.2vw, 12rem);
+    line-height: 0.8;
+    letter-spacing: 0.06em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(208, 175, 98, 0.22);
+    transform: translateY(16%);
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  @media (max-width: 1000px) {
+    .foot__main { grid-template-columns: 1fr 1fr; }
+    .foot__brand { grid-column: 1 / -1; }
+    .foot__cta-inner { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .foot__main { grid-template-columns: 1fr; }
+    .foot__legal { margin-left: 0; flex-wrap: wrap; }
+  }
+</style>

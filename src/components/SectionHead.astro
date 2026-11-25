@@ -1,0 +1,80 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  index?: string;
+  link?: string;
+  linkLabel?: string;
+  tone?: 'light' | 'dark';
+}
+const { eyebrow, title, index, link, linkLabel = 'Lihat semua', tone = 'light' } = Astro.props;
+---
+<div class:list={['sh', `sh--${tone}`]}>
+  <div class="sh__left">
+    {index && <span class="sh__index">{index}</span>}
+    <div>
+      {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+      <h2 class="sh__title">{title}</h2>
+    </div>
+  </div>
+  {link && (
+    <a class="sh__link" href={link}>
+      {linkLabel} <span class="sh__arrow">→</span>
+    </a>
+  )}
+</div>
+
+<style>
+  .sh {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .sh--dark { border-color: var(--line-dark); }
+  .sh__left { display: flex; align-items: baseline; gap: 1rem; }
+  .sh__index {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--gold-600);
+    padding-bottom: 0.15rem;
+  }
+  .sh__title {
+    font-family: var(--serif-display);
+    font-size: clamp(1.6rem, 3.2vw, 2.35rem);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1;
+    margin-top: 0.45rem;
+  }
+  .sh--dark .sh__title { color: var(--paper); }
+  .sh--dark .eyebrow { color: var(--gold-200); }
+  .sh--dark .sh__index { color: var(--gold-200); }
+  .sh__link {
+    font-family: var(--sans);
+    font-size: 0.63rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.35rem;
+    white-space: nowrap;
+    transition: color 0.3s var(--ease);
+  }
+  .sh--dark .sh__link { color: rgba(244, 239, 228, 0.5); }
+  .sh__link:hover { color: var(--ink); }
+  .sh--dark .sh__link:hover { color: var(--gold-200); }
+  .sh__arrow { transition: transform 0.4s var(--ease-out); }
+  .sh__link:hover .sh__arrow { transform: translateX(4px); }
+
+  @media (max-width: 560px) {
+    .sh { flex-direction: column; align-items: flex-start; gap: 0.9rem; }
+  }
+</style>

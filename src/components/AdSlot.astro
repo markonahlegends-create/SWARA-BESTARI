@@ -1,0 +1,244 @@
+---
+/**
+ * AdSlot — slot iklan fleksibel dengan placeholder "tersedia".
+ * Untuk iklan asli: kirim prop `image`, `href`, `brand`, `headline`.
+ */
+interface Props {
+  format?: 'billboard' | 'leaderboard' | 'halfpage' | 'square' | 'strip' | 'skyscraper' | 'compact' | 'native';
+  label?: string;
+  image?: string;
+  href?: string;
+  brand?: string;
+  headline?: string;
+  tone?: 'light' | 'dark';
+  class?: string;
+}
+
+const {
+  format = 'square',
+  label = 'Ruang Iklan',
+  image,
+  href,
+  brand,
+  headline,
+  tone = 'light',
+  class: className = '',
+} = Astro.props;
+
+const sizes = {
+  billboard: '970 × 250',
+  leaderboard: '728 × 90',
+  halfpage: '300 × 600',
+  square: '300 × 250',
+  strip: '970 × 90',
+  skyscraper: '160 × 600',
+  compact: '320 × 220',
+  native: 'Native',
+};
+---
+
+<aside
+  class:list={['ad', `ad--${format}`, `ad--${tone}`, className, { 'ad--filled': !!image }]}
+  aria-label="Iklan"
+  data-ad-slot={format}
+>
+  <div class="ad__label">
+    <span class="ad__tag">{label}</span>
+    <span class="ad__size">{sizes[format]}</span>
+  </div>
+
+  {image ? (
+    <a class="ad__creative" href={href ?? '#'} rel="sponsored noopener">
+      <img src={image} alt={headline ?? brand ?? 'Iklan'} loading="lazy" />
+      {headline && (
+        <span class="ad__copy">
+          <span class="ad__brand">{brand}</span>
+          <span class="ad__headline">{headline}</span>
+        </span>
+      )}
+    </a>
+  ) : (
+    <div class="ad__empty">
+      <div class="ad__frame">
+        <svg class="ad__mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <path d="M20 3 37 12v16L20 37 3 28V12Z" stroke="currentColor" stroke-width="0.9" opacity="0.5"/>
+          <path d="M20 11 30 16v8l-10 5-10-5v-8Z" stroke="currentColor" stroke-width="0.9" opacity="0.8"/>
+          <circle cx="20" cy="20" r="2" fill="currentColor"/>
+        </svg>
+        <span class="ad__avail">Tersedia</span>
+        <span class="ad__cta">Pasang iklan Anda di sini</span>
+        <a class="ad__contact" href="/iklan">Hubungi tim iklan →</a>
+      </div>
+    </div>
+  )}
+</aside>
+
+<style>
+  .ad {
+    position: relative;
+    font-family: var(--sans);
+  }
+
+  .ad__label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    margin-bottom: 0.5rem;
+  }
+  .ad__tag {
+    position: relative;
+    padding-left: 0.9rem;
+  }
+  .ad__tag::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 5px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+  }
+  .ad__size { opacity: 0.65; }
+
+  /* ── empty state ── */
+  .ad__empty {
+    border: 1px solid var(--line);
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 7px,
+        rgba(176, 135, 54, 0.035) 7px,
+        rgba(176, 135, 54, 0.035) 14px
+      ),
+      var(--paper-2);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: var(--gold-700);
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.4s var(--ease), background 0.4s var(--ease);
+  }
+  .ad:hover .ad__empty {
+    border-color: var(--gold);
+  }
+  .ad__frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 1rem;
+  }
+  .ad__mark {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 0.35rem;
+    opacity: 0.75;
+    transition: transform 0.8s var(--ease-out), opacity 0.4s;
+  }
+  .ad:hover .ad__mark { transform: rotate(30deg); opacity: 1; }
+  .ad__avail {
+    font-size: 0.6rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .ad__cta {
+    font-family: var(--serif-body);
+    font-style: italic;
+    font-size: 0.92rem;
+    color: var(--muted);
+    letter-spacing: 0;
+    text-transform: none;
+    max-width: 20ch;
+  }
+  .ad__contact {
+    margin-top: 0.5rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+    border-bottom: 1px solid rgba(176, 135, 54, 0.35);
+    padding-bottom: 1px;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .ad__contact:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ── format proporsional ── */
+  .ad--billboard .ad__empty { min-height: 210px; }
+  .ad--leaderboard .ad__empty { min-height: 90px; }
+  .ad--leaderboard .ad__frame { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0.9rem; }
+  .ad--leaderboard .ad__mark { width: 26px; height: 26px; margin: 0; }
+  .ad--leaderboard .ad__cta { max-width: none; }
+  .ad--leaderboard .ad__contact { margin: 0; }
+  .ad--strip .ad__empty { min-height: 78px; }
+  .ad--strip .ad__frame { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0.9rem; }
+  .ad--strip .ad__mark { width: 24px; height: 24px; margin: 0; }
+  .ad--strip .ad__cta { max-width: none; }
+  .ad--strip .ad__contact { margin: 0; }
+  .ad--halfpage .ad__empty { min-height: 520px; }
+  .ad--square .ad__empty { min-height: 240px; }
+  .ad--skyscraper .ad__empty { min-height: 400px; }
+  .ad--compact .ad__empty { min-height: 200px; }
+
+  /* ── dark tone ── */
+  .ad--dark .ad__label { color: rgba(244, 239, 228, 0.46); }
+  .ad--dark .ad__empty {
+    border-color: var(--line-dark);
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 7px,
+        rgba(208, 175, 98, 0.05) 7px,
+        rgba(208, 175, 98, 0.05) 14px
+      ),
+      var(--ink-2);
+    color: var(--gold-200);
+  }
+  .ad--dark .ad__avail { color: var(--paper); }
+  .ad--dark .ad__cta { color: rgba(244, 239, 228, 0.6); }
+  .ad--dark .ad__contact { color: var(--gold-200); }
+
+  /* ── filled creative ── */
+  .ad__creative {
+    display: block;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .ad__creative img {
+    width: 100%;
+    height: auto;
+    transition: transform 1.2s var(--ease-out);
+  }
+  .ad__creative:hover img { transform: scale(1.03); }
+  .ad__copy {
+    display: block;
+    padding: 0.8rem 1rem;
+    background: var(--paper-2);
+  }
+  .ad__brand {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+  }
+  .ad__headline {
+    font-family: var(--serif-body);
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  /* ── native ── */
+  .ad--native .ad__empty { min-height: 150px; }
+  .ad--native .ad__frame { flex-direction: row; gap: 1.25rem; align-items: center; text-align: left; }
+  .ad--native .ad__mark { margin: 0; }
+</style>

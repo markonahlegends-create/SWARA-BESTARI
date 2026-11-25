@@ -1,0 +1,172 @@
+---
+import Base from '../layouts/Base.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const episodes = [
+  { no: 41, title: 'Merawat Arsip, Merawat Masa Depan', guest: 'Rangga Prasetya', dur: '48:12', date: '20 Nov 2026', desc: 'Mengapa arsip yang tidak dibaca adalah gudang, bukan warisan. Percakapan tentang kerja dokumentasi yang jarang dirayakan.' },
+  { no: 40, title: 'Bahasa yang Tinggal Satu Penutur', guest: 'Iwan Setiawan', dur: '52:04', date: '6 Nov 2026', desc: 'Enam belas kata untuk hujan, dan apa yang terjadi ketika semua itu hanya tersimpan dalam satu ingatan.' },
+  { no: 39, title: 'Apa yang Kita Bicarakan Ketika Membicarakan Candi', guest: 'Dr. Hendra Wicaksono', dur: '61:30', date: '23 Okt 2026', desc: 'Arkeologi bukan tentang masa lalu, tetapi tentang siapa yang berhak menentukan apa yang layak diingat.' },
+  { no: 38, title: 'Pasar sebagai Monumen', guest: 'Mutia Rahmawati', dur: '44:55', date: '9 Okt 2026', desc: 'Dari kios tiga kali empat meter di Semarang: tentang pintu tua yang dinaikkan lewat tangga darurat.' },
+  { no: 37, title: 'Membaca Ulang Kurasi', guest: 'Anindita Kusuma', dur: '57:18', date: '25 Sep 2026', desc: 'Siapa yang memilih, siapa yang dipilih, dan mengapa "kualitas" bukan kategori netral.' },
+  { no: 36, title: 'Kesepian di Kota yang Tidak Pernah Tidur', guest: 'Fajar Ramadhan', dur: '49:41', date: '11 Sep 2026', desc: 'Kesepian sebagai masalah arsitektur sosial, bukan kegagalan pribadi.' },
+];
+---
+<Base title="Suara dari Balik Halaman" description="Podcast Swara Bestari — percakapan panjang dengan penulis, peneliti, dan seniman.">
+  <header class="ph">
+    <div class="wrap">
+      <span class="eyebrow eyebrow--light">Podcast</span>
+      <h1 class="ph__title">Suara dari<br /><em>Balik Halaman</em></h1>
+      <p class="ph__desc">
+        Percakapan panjang—tanpa potongan dramatis—dengan mereka yang menulis,
+        meneliti, dan merawat kebudayaan. Baru setiap dua minggu.
+      </p>
+      <div class="ph__stats">
+        <span><strong>41</strong> episode</span>
+        <span class="ph__dot"></span>
+        <span><strong>340 rb</strong> pendengar</span>
+        <span class="ph__dot"></span>
+        <span><strong>Spotify · Apple · YouTube</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="wrap pgrid">
+      <div class="plist">
+        <div class="plist__head">
+          <span class="eyebrow">Episode Terbaru</span>
+          <span class="plist__sort">Terbaru → Terlama</span>
+        </div>
+        {episodes.map((e, i) => (
+          <article class="pep" data-reveal>
+            <div class="pep__no">E.{e.no}</div>
+            <div class="pep__body">
+              <div class="pep__meta">{e.date} · {e.dur}</div>
+              <h2 class="pep__title">{e.title}</h2>
+              <p class="pep__desc">{e.desc}</p>
+              <div class="pep__foot">
+                <span class="pep__guest">bersama {e.guest}</span>
+                <div class="pep__actions">
+                  <button class="pep__play" type="button" aria-label={`Putar episode ${e.no}`}>
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+                  </button>
+                  <a href="#transkrip" class="pep__link">Transkrip</a>
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+      <aside class="prail">
+        <div class="psub">
+          <span class="eyebrow eyebrow--light">Dengarkan di</span>
+          <ul>
+            <li><a href="#spotify">Spotify <span>↗</span></a></li>
+            <li><a href="#apple">Apple Podcasts <span>↗</span></a></li>
+            <li><a href="#youtube">YouTube <span>↗</span></a></li>
+            <li><a href="#rss">RSS Feed <span>↗</span></a></li>
+          </ul>
+        </div>
+        <AdSlot format="square" />
+        <div class="pnote">
+          <span class="pnote__eyebrow">Ingin jadi narasumber?</span>
+          <p>Kami mencari peneliti, seniman, dan praktisi yang ingin bicara pelan-pelan.</p>
+          <a href="mailto:podcast@swarabestari.id">podcast@swarabestari.id</a>
+        </div>
+        <AdSlot format="halfpage" />
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .ph { background: var(--ink); color: var(--paper); padding-block: clamp(2.75rem, 6vw, 5rem); position: relative; overflow: hidden; }
+  .ph::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(208, 175, 98, 0.06) 60px);
+    pointer-events: none;
+  }
+  .ph .wrap { position: relative; }
+  .ph__title {
+    font-family: var(--serif-display);
+    font-size: clamp(2.5rem, 6vw, 4.6rem);
+    font-weight: 500;
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    margin-block: 0.9rem 1.25rem;
+  }
+  .ph__title em { color: var(--gold-200); }
+  .ph__desc { color: rgba(244, 239, 228, 0.6); max-width: 54ch; line-height: 1.7; }
+  .ph__stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(244, 239, 228, 0.5);
+  }
+  .ph__stats strong { color: var(--gold-200); font-weight: 500; }
+  .ph__dot { width: 3px; height: 3px; border-radius: 50%; background: var(--gold-600); }
+
+  .pgrid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: clamp(2rem, 4vw, 3.5rem); align-items: start; }
+  .plist__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 0.7rem;
+    margin-bottom: 0.5rem;
+  }
+  .plist__sort { font-family: var(--sans); font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); }
+  .pep {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 1.25rem;
+    padding-block: clamp(1.35rem, 2.5vw, 2rem);
+    border-bottom: 1px solid var(--line);
+  }
+  .pep__no { font-family: var(--serif-display); font-style: italic; font-size: 1.05rem; color: var(--gold-700); padding-top: 0.2rem; }
+  .pep__meta { font-family: var(--sans); font-size: 0.54rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted-2); }
+  .pep__title { font-family: var(--serif-display); font-size: clamp(1.35rem, 2.2vw, 1.85rem); font-weight: 500; line-height: 1.1; letter-spacing: -0.015em; margin-block: 0.4rem 0.5rem; }
+  .pep__desc { font-size: 0.92rem; line-height: 1.65; color: var(--muted); max-width: 60ch; }
+  .pep__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1rem; }
+  .pep__guest { font-family: var(--sans); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-700); }
+  .pep__actions { display: flex; align-items: center; gap: 1rem; }
+  .pep__play {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--gold); background: transparent; color: var(--gold-700);
+    display: grid; place-items: center; cursor: pointer;
+    transition: background 0.35s, color 0.35s;
+  }
+  .pep__play svg { width: 13px; height: 13px; margin-left: 2px; }
+  .pep__play:hover { background: var(--gold-600); color: var(--ivory); }
+  .pep__link { font-family: var(--sans); font-size: 0.56rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 1px; }
+  .pep__link:hover { color: var(--ink); border-color: var(--ink); }
+
+  .prail { display: flex; flex-direction: column; gap: 1.75rem; position: sticky; top: 6.5rem; }
+  .psub { background: var(--ink); color: var(--paper); padding: 1.5rem; }
+  .psub ul { list-style: none; padding: 0; margin-top: 1rem; display: flex; flex-direction: column; }
+  .psub li { border-top: 1px solid var(--line-dark); }
+  .psub a {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-block: 0.8rem;
+    font-family: var(--serif-display); font-size: 1.05rem;
+    transition: color 0.3s;
+  }
+  .psub a:hover { color: var(--gold-200); }
+  .psub a span { color: var(--gold-200); font-size: 0.8rem; }
+  .pnote { border: 1px solid var(--line); padding: 1.4rem; background: var(--paper-2); }
+  .pnote__eyebrow { font-family: var(--sans); font-size: 0.54rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-700); }
+  .pnote p { font-size: 0.88rem; line-height: 1.6; color: var(--muted); margin-block: 0.6rem; }
+  .pnote a { font-family: var(--sans); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--ink); border-bottom: 1px solid var(--ink); }
+  @media (max-width: 960px) {
+    .pgrid { grid-template-columns: 1fr; }
+    .prail { position: static; }
+  }
+</style>

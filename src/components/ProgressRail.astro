@@ -1,0 +1,25 @@
+---
+// Garis kemajuan gulir tipis di atas — aksen mistis-editorial.
+---
+<div class="rail" aria-hidden="true">
+  <div class="rail__bar" id="progress-bar"></div>
+</div>
+
+<style>
+  .rail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 9997;
+    pointer-events: none;
+  }
+  .rail__bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold-700), var(--gold-200));
+    transform-origin: left;
+    transition: width 0.1s linear;
+  }
+</style>

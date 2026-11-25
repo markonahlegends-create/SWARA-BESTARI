@@ -1,0 +1,75 @@
+---
+import { byRubrik } from '../data/articles.js';
+import { rubrikBySlug } from '../data/site.js';
+interface Props {
+  currentSlug: string;
+  rubrik: string;
+}
+const { currentSlug, rubrik } = Astro.props;
+const pool = byRubrik(rubrik).filter((a) => a.slug !== currentSlug);
+const pick = pool[0];
+const r = rubrikBySlug[rubrik];
+---
+{pick && (
+  <aside class="baca" aria-label="Baca juga">
+    <span class="baca__label">Baca juga</span>
+    <a href={`/tulisan/${pick.slug}`} class="baca__link">
+      <span class="baca__rubrik">{r.name}</span>
+      <span class="baca__title">{pick.title}</span>
+      <span class="baca__arrow" aria-hidden="true">→</span>
+    </a>
+  </aside>
+)}
+
+<style>
+  .baca {
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+    margin-block: 2.25em;
+    padding-block: 1.25rem;
+    border-block: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .baca__label {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+    flex: none;
+    padding-right: 1.25rem;
+    border-right: 1px solid var(--line);
+  }
+  .baca__link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 220px;
+    flex-wrap: wrap;
+  }
+  .baca__rubrik {
+    font-family: var(--sans);
+    font-size: 0.5rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    border: 1px solid var(--line);
+    padding: 0.25em 0.55em;
+  }
+  .baca__title {
+    font-family: var(--serif-display);
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    line-height: 1.25;
+    color: var(--ink);
+    transition: color 0.3s;
+  }
+  .baca__link:hover .baca__title { color: var(--gold-700); }
+  .baca__arrow {
+    margin-left: auto;
+    color: var(--gold-600);
+    transition: transform 0.4s var(--ease-out);
+  }
+  .baca__link:hover .baca__arrow { transform: translateX(4px); }
+</style>

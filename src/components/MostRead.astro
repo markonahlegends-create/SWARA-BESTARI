@@ -1,0 +1,87 @@
+---
+import { latest } from '../data/articles.js';
+const list = latest.slice(0, 5);
+---
+<section class="mr" aria-labelledby="mr-title">
+  <div class="mr__head">
+    <h2 class="mr__title" id="mr-title">Paling Dibaca</h2>
+    <span class="mr__note">7 hari terakhir</span>
+  </div>
+  <ol class="mr__list">
+    {list.map((a, i) => (
+      <li>
+        <a href={`/tulisan/${a.slug}`} class="mr__item">
+          <span class="mr__num">{String(i + 1).padStart(2, '0')}</span>
+          <span class="mr__body">
+            <span class="mr__kicker">{a.rubrik}</span>
+            <span class="mr__text">{a.title}</span>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .mr {
+    border: 1px solid var(--line);
+    background: var(--paper-2);
+    padding: 1.35rem 1.35rem 0.75rem;
+  }
+  .mr__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 0.7rem;
+    margin-bottom: 0.35rem;
+  }
+  .mr__title {
+    font-family: var(--serif-display);
+    font-size: 1.22rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .mr__note {
+    font-family: var(--sans);
+    font-size: 0.5rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+  }
+  .mr__list { list-style: none; padding: 0; }
+  .mr__item {
+    display: flex;
+    gap: 0.9rem;
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--line-soft);
+    align-items: flex-start;
+  }
+  .mr__list li:last-child .mr__item { border-bottom: 0; }
+  .mr__num {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--gold);
+    width: 1.7rem;
+    flex: none;
+    transition: color 0.3s;
+  }
+  .mr__item:hover .mr__num { color: var(--gold-700); }
+  .mr__body { display: flex; flex-direction: column; gap: 0.2rem; }
+  .mr__kicker {
+    font-family: var(--sans);
+    font-size: 0.5rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+  }
+  .mr__text {
+    font-family: var(--serif-display);
+    font-size: 1rem;
+    line-height: 1.2;
+    transition: color 0.3s;
+  }
+  .mr__item:hover .mr__text { color: var(--gold-700); }
+</style>
