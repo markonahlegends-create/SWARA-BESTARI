@@ -271,31 +271,38 @@ function stripAngka(doc, y, item, { w = CW, tinggi = 72 } = {}) {
   const gap = 12;
   const cw = (w - gap * (item.length - 1)) / item.length;
 
-  // Label terpanjang menentukan tinggi kotak — jangan sampai meluber.
+  // Tiap nilai dipaksa satu baris dengan menyusutkan huruf. Karena tinggi
+  // nilai jadi seragam, label bisa ditaruh pada satu garis dasar yang sama.
+  const nilaiSiap = item.map(([nilai]) => {
+    let size = 14;
+    doc.font('display').fontSize(size);
+    while (size > 7.5 && doc.widthOfString(nilai) > cw - 24) {
+      size -= 0.5;
+      doc.fontSize(size);
+    }
+    return { nilai, size, tinggi: doc.fontSize(size).heightOfString(nilai, { width: cw - 24 }) };
+  });
+
   doc.font('sans').fontSize(6);
   const labelH = Math.max(
     ...item.map(([, label]) =>
       doc.heightOfString(label.toUpperCase(), { width: cw - 24, characterSpacing: 0.9 })
     )
   );
-  const h = Math.max(tinggi, 38 + labelH + 12);
+  const nilaiH = Math.max(...nilaiSiap.map((n) => n.tinggi));
+  const h = Math.max(tinggi, 14 + nilaiH + 7 + labelH + 12);
   if (!muat(y, h)) return y; // tidak cukup ruang — lewati
 
-  item.forEach(([nilai, label], i) => {
+  item.forEach(([, label], i) => {
     const x = M + i * (cw + gap);
     doc.rect(x, y, cw, h).fill('#faf7f0');
     doc.rect(x, y, cw, 1.2).fill(C.goldLight);
 
-    // Susutkan huruf sampai nilai muat satu baris — jangan sampai meluber.
-    let size = 14;
-    doc.font('display').fontSize(size);
-    while (size > 8 && doc.widthOfString(nilai) > cw - 24) {
-      size -= 0.5;
-      doc.fontSize(size);
-    }
-    doc.fillColor(C.ink).text(nilai, x + 12, y + 14, { width: cw - 24, lineBreak: false });
+    doc.font('display').fontSize(nilaiSiap[i].size).fillColor(C.ink)
+      .text(nilaiSiap[i].nilai, x + 12, y + 14, { width: cw - 24, lineBreak: false });
+
     doc.font('sans').fontSize(6).fillColor(C.muted)
-      .text(label.toUpperCase(), x + 12, y + 38, {
+      .text(label.toUpperCase(), x + 12, y + 14 + nilaiH + 7, {
         width: cw - 24, characterSpacing: 0.9,
       });
   });
