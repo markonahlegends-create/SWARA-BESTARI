@@ -297,6 +297,64 @@ export async function ALL({ request }) {
     return json({ stats: data || (await fallbackStats()) });
   }
 
+  /* ── Diagnostik: apakah token benar-benar bisa dipakai? ──
+     Dijalankan SETELAH login, sebelum menulis apa pun. */
+  if (action === 'diagnose') {
+    if (!verifyToken(readCookie(request))) {
+      return json({ error: 'Sesi berakhir. Silakan masuk lagi.' }, 401);
+    }
+    const out = {};
+
+    // 1. Baca identitas token & cakupan repositorinya.
+    try {
+      const r = await fetch(`https://api.github.com/repos/${REPO}`, {
+        headers: ghHeaders(),
+      });
+      if (r.ok) {
+        const j = await r.json();
+        out.repo = { ok: true, full_name: j.full_name, private: j.private, default_branch: j.default_branch };
+        out.repoWrite = Boolean(j.permissions?.push);
+      } else if (r.status === 401) {
+        out.repo = { ok: false, error: 'Token tidak dikenali GitHub (401). Mungkin salah salin atau sudah kedaluwarsa.' };
+      } else if (r.status === 403 || r.status === 404) {
+        out.repo = { ok: false, error: `Token tidak punya akses ke ${REPO} (${r.status}). Periksa Repository access.` };
+      } else {
+        out.repo = { ok: false, error: `GitHub menjawab ${r.status}.` };
+      }
+    } catch (e) {
+      out.repo = { ok: false, error: `Tidak bisa menghubungi GitHub (${e.cause?.code || e.message}).` };
+    }
+
+    // 2. Apakah berkas konten bisa dibaca?
+    try {
+      const { sha } = await readFile(FILES.articles);
+      out.read = { ok: true, sha: sha ? sha.slice(0, 7) : null };
+    } catch (e) {
+      out.read = { ok: false, error: e.message };
+    }
+
+    // 3. Apakah izin tulis ada? (hanya memeriksa, tidak menulis)
+    out.write = out.repoWrite
+      ? { ok: true, note: 'Izin Contents: Read and write terdeteksi.' }
+      : { ok: false, error: 'Token hanya bisa membaca. Set Contents ke Read and write.' };
+
+    // 4. Pratinjau commit terakhir agar terlihat token ini "melihat" repo yang benar.
+    try {
+      const r = await fetch(
+        `https://api.github.com/repos/${REPO}/commits?path=${encodeURIComponent(FILES.articles)}&per_page=1`,
+        { headers: ghHeaders() }
+      );
+      if (r.ok) {
+        const [c] = await r.json();
+        out.lastCommit = c?.commit?.message?.split('\n')[0] || null;
+      }
+    } catch {
+      /* opsional */
+    }
+
+    return json({ ok: Boolean(out.repo?.ok && out.read?.ok && out.write?.ok), ...out });
+  }
+
   /* ── Selebihnya butuh sesi ── */
   if (!verifyToken(readCookie(request))) {
     return json({ error: 'Sesi berakhir. Silakan masuk lagi.' }, 401);

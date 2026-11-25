@@ -134,6 +134,18 @@ const SITE = 'Swara Bestari';
             </div>
           </div>
 
+          <div class="panel" id="diag-panel">
+            <div class="panel__h">
+              <h2 class="panel__t">Kesiapan sistem</h2>
+              <button class="panel__link" id="diag-btn">Periksa ulang</button>
+            </div>
+            <div id="diag-body">
+              <p style="color:#8b8272;font-size:.86rem;margin:0">
+                Memeriksa sambungan GitHub…
+              </p>
+            </div>
+          </div>
+
           <div class="panel panel--note">
             <h2 class="panel__t">Cara kerja</h2>
             <p>
@@ -878,6 +890,24 @@ const SITE = 'Swara Bestari';
         font-size: 0.85rem;
       }
 
+      /* ══ Diagnostik ══ */
+      .diag { display: grid; gap: 0.55rem; }
+      .diag__row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        font-size: 0.86rem;
+        padding: 0.5rem 0.65rem;
+        background: #fbf7ee;
+        border-left: 2px solid var(--line);
+        border-radius: 2px;
+      }
+      .diag__row.ok { border-left-color: #2f6b45; background: #f2f8f4; }
+      .diag__row.bad { border-left-color: var(--err); background: #fdf3f2; }
+      .diag__ico { flex: none; font-size: 0.9rem; line-height: 1.4; }
+      .diag__t { font-weight: 500; }
+      .diag__d { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 0.1rem; }
+
       /* ══ Toast ══ */
       .toast {
         position: fixed;
@@ -1035,7 +1065,65 @@ const SITE = 'Swara Bestari';
           if (e.message.includes('Sesi')) {
             $('#app').hidden = true;
             $('#gate').hidden = false;
-          } else toast(e.message, true);
+          } else {
+            toast(e.message, true);
+            // Tetap tampilkan diagnostik supaya penyebabnya terlihat.
+            runDiagnostics();
+          }
+        }
+      }
+
+      async function runDiagnostics() {
+        const body = $('#diag-body');
+        body.innerHTML = `<div class="diag"><div class="diag__row">
+          <span class="diag__ico">◌</span>
+          <span class="diag__t">Memeriksa sambungan GitHub…</span></div></div>`;
+        try {
+          const r = await api('diagnose');
+          const rows = [];
+
+          rows.push({
+            ok: r.repo?.ok,
+            t: 'Akses repositori',
+            d: r.repo?.ok
+              ? `${r.repo.full_name} · ${r.repo.private ? 'privat' : 'publik'}`
+              : r.repo?.error || 'Gagal memeriksa.',
+          });
+
+          rows.push({
+            ok: r.read?.ok,
+            t: 'Baca berkas konten',
+            d: r.read?.ok
+              ? `articles.json terbaca${r.read.sha ? ` (versi ${r.read.sha})` : ''}.`
+              : r.read?.error || 'Gagal membaca.',
+          });
+
+          rows.push({
+            ok: r.write?.ok,
+            t: 'Izin menulis',
+            d: r.write?.ok
+              ? 'Token boleh menyimpan perubahan. Dashboard siap dipakai.'
+              : r.write?.error || 'Tidak ada izin menulis.',
+          });
+
+          if (r.lastCommit) {
+            rows.push({ ok: true, t: 'Commit terakhir', d: r.lastCommit });
+          }
+
+          body.innerHTML = `<div class="diag">${rows
+            .map(
+              (x) => `<div class="diag__row ${x.ok ? 'ok' : 'bad'}">
+                <span class="diag__ico">${x.ok ? '✓' : '✕'}</span>
+                <span><span class="diag__t">${esc(x.t)}</span>
+                <span class="diag__d">${esc(x.d)}</span></span>
+              </div>`
+            )
+            .join('')}</div>`;
+        } catch (e) {
+          body.innerHTML = `<div class="diag"><div class="diag__row bad">
+            <span class="diag__ico">✕</span>
+            <span><span class="diag__t">Pemeriksaan gagal</span>
+            <span class="diag__d">${esc(e.message)}</span></span></div></div>`;
         }
       }
 
@@ -1051,6 +1139,7 @@ const SITE = 'Swara Bestari';
         renderSettings();
         renderRubrikSelect();
         renderImageSelect();
+        runDiagnostics();
       }
 
       /* ══ Ikhtisar ══ */
@@ -1619,6 +1708,10 @@ const SITE = 'Swara Bestari';
       });
 
       /* ══ Terbitkan ulang ══ */
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('#diag-btn')) runDiagnostics();
+      });
+
       $('#publish-btn').addEventListener('click', async () => {
         const btn = $('#publish-btn');
         btn.disabled = true;
