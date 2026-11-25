@@ -1,0 +1,146 @@
+---
+// Kartu berlangganan ringkas — penguat retensi.
+import { site } from '../data/site.js';
+---
+<section class="ni">
+  <div class="ni__ring" aria-hidden="true"></div>
+  <span class="eyebrow eyebrow--light">Surat Swara</span>
+  <h2 class="ni__title">Satu surat,<br /><em>setiap Jumat.</em></h2>
+  <p class="ni__desc">
+    Tiga tulisan pilihan, satu kutipan arsip, dan satu rekomendasi bacaan panjang.
+    Ditulis tangan oleh editor, bukan oleh mesin.
+  </p>
+  <form class="ni__form" id="inline-newsletter" novalidate>
+    <label class="sr-only" for="ni-email">Alamat surel</label>
+    <input id="ni-email" type="email" name="email" placeholder="alamat surel Anda" required autocomplete="email" />
+    <button type="submit" class="ni__btn" aria-label="Berlangganan">
+      <span>→</span>
+    </button>
+  </form>
+  <p class="ni__note" id="ni-note">Sudah dibaca 14.200 pelanggan. Gratis.</p>
+  <a class="ni__phone" href={site.whatsapp} target="_blank" rel="noopener">
+    Atau kirim pesan ke WhatsApp redaksi <span>↗</span>
+  </a>
+</section>
+
+<script>
+  const form = document.getElementById('inline-newsletter') as HTMLFormElement | null;
+  const note = document.getElementById('ni-note');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = (form.querySelector('input[name="email"]') as HTMLInputElement)?.value.trim();
+    if (!note) return;
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      note.textContent = 'Alamat surel belum tepat.';
+      note.style.color = '#d98b74';
+      return;
+    }
+    note.textContent = 'Terima kasih. Surat pertama tiba Jumat ini.';
+    note.style.color = 'var(--gold-200)';
+    form.reset();
+  });
+</script>
+
+<style>
+  .ni {
+    position: relative;
+    background: var(--ink-2);
+    color: var(--paper);
+    padding: clamp(2rem, 4vw, 3rem);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+  }
+  .ni__ring {
+    position: absolute;
+    right: -120px;
+    top: -120px;
+    width: 340px;
+    height: 340px;
+    border: 1px solid rgba(208, 175, 98, 0.2);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .ni__ring::after {
+    content: '';
+    position: absolute;
+    inset: 40px;
+    border: 1px solid rgba(208, 175, 98, 0.14);
+    border-radius: 50%;
+  }
+  .ni__title {
+    font-family: var(--serif-display);
+    font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.08;
+    margin-block: 0.75rem 0.9rem;
+    letter-spacing: -0.015em;
+    position: relative;
+  }
+  .ni__title em { color: var(--gold-200); }
+  .ni__desc {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: rgba(244, 239, 228, 0.6);
+    max-width: 38ch;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  .ni__form {
+    display: flex;
+    width: 100%;
+    max-width: 380px;
+    border-bottom: 1px solid rgba(244, 239, 228, 0.3);
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .ni__form:focus-within { border-color: var(--gold); }
+  .ni__form input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: 0;
+    padding: 0.75rem 0;
+    color: var(--paper);
+    font-family: var(--sans);
+    font-size: 0.85rem;
+  }
+  .ni__form input::placeholder { color: rgba(244, 239, 228, 0.46); }
+  .ni__form input:focus { outline: none; }
+  .ni__btn {
+    background: none;
+    border: 0;
+    color: var(--gold-200);
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 0 0.3rem;
+    transition: transform 0.4s var(--ease-out);
+  }
+  .ni__btn:hover { transform: translateX(5px); }
+  .ni__note {
+    margin-top: 0.85rem;
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: rgba(244, 239, 228, 0.46);
+    position: relative;
+  }
+  .ni__phone {
+    margin-top: 1.75rem;
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-200);
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+    position: relative;
+  }
+  .ni__phone:hover { border-color: rgba(225, 197, 119, 0.4); }
+</style>

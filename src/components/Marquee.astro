@@ -1,0 +1,51 @@
+---
+import { rubrik } from '../data/site.js';
+const words = [...rubrik.map((r) => r.name), 'Pemikiran', 'Ingatan', 'Warisan', 'Kata'];
+const row = [...words, ...words];
+---
+<div class="marq" aria-hidden="true">
+  <div class="marq__track" data-marquee>
+    {row.map((w, i) => (
+      <span class="marq__item">
+        {w}
+        <span class="marq__diamond">◆</span>
+      </span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .marq {
+    overflow: hidden;
+    border-block: 1px solid var(--line);
+    background: var(--paper-2);
+    padding-block: 0.85rem;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .marq__track {
+    display: flex;
+    width: max-content;
+    animation: slide 42s linear infinite;
+    will-change: transform;
+  }
+  @keyframes slide {
+    to { transform: translateX(-50%); }
+  }
+  .marq__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.6rem;
+    padding-inline: 1.6rem;
+    font-family: var(--sans);
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .marq__diamond {
+    font-size: 0.42rem;
+    color: var(--gold-600);
+  }
+</style>

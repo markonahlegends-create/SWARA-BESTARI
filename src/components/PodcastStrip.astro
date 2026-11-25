@@ -1,0 +1,161 @@
+---
+const episodes = [
+  { no: 'E.41', title: 'Merawat Arsip, Merawat Masa Depan', guest: 'bersama Rangga Prasetya', dur: '48 mnt' },
+  { no: 'E.40', title: 'Bahasa yang Tinggal Satu Penutur', guest: 'bersama Iwan Setiawan', dur: '52 mnt' },
+  { no: 'E.39', title: 'Apa yang Kita Bicarakan Ketika Membicarakan Candi', guest: 'bersama Dr. Hendra Wicaksono', dur: '61 mnt' },
+];
+---
+<section class="pc" aria-labelledby="pc-title">
+  <div class="pc__head">
+    <div>
+      <span class="eyebrow">Swara Bestari — Dengar</span>
+      <h2 class="pc__title" id="pc-title">Suara dari <em>Balik Halaman</em></h2>
+    </div>
+    <span class="pc__badge">Podcast</span>
+  </div>
+
+  <div class="pc__player" aria-hidden="true">
+    <div class="pc__wave">
+      {Array.from({ length: 42 }).map((_, i) => (
+        <span style={`--h:${18 + Math.abs(Math.sin(i * 0.85)) * 62}%; --i:${i}`}></span>
+      ))}
+    </div>
+    <button class="pc__play" type="button" aria-label="Putar episode terbaru">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+    </button>
+  </div>
+
+  <ol class="pc__list">
+    {episodes.map((e, i) => (
+      <li>
+        <a href="/podcast" class="pc__ep">
+          <span class="pc__no">{e.no}</span>
+          <span class="pc__epbody">
+            <span class="pc__eptitle">{e.title}</span>
+            <span class="pc__epguest">{e.guest}</span>
+          </span>
+          <span class="pc__dur">{e.dur}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .pc {
+    border: 1px solid var(--line);
+    background: var(--paper-2);
+    padding: clamp(1.6rem, 3.2vw, 2.4rem);
+    display: flex;
+    flex-direction: column;
+  }
+  .pc__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .pc__title {
+    font-family: var(--serif-display);
+    font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+    font-weight: 400;
+    line-height: 1.05;
+    margin-top: 0.55rem;
+    letter-spacing: -0.015em;
+  }
+  .pc__title em { color: var(--gold-700); }
+  .pc__badge {
+    font-family: var(--sans);
+    font-size: 0.52rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+    border: 1px solid var(--gold);
+    border-radius: 999px;
+    padding: 0.4em 0.85em;
+    white-space: nowrap;
+  }
+  .pc__player {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    margin-block: clamp(1.25rem, 2.5vw, 1.85rem);
+    padding: 1rem 1.15rem;
+    background: var(--ink);
+    color: var(--gold-200);
+  }
+  .pc__wave {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 44px;
+  }
+  .pc__wave span {
+    flex: 1;
+    height: var(--h);
+    background: linear-gradient(to top, rgba(208, 175, 98, 0.28), var(--gold-200));
+    transform-origin: center;
+    animation: wave 1.6s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i) * -0.055s);
+    opacity: 0.85;
+  }
+  @keyframes wave {
+    from { transform: scaleY(0.42); opacity: 0.55; }
+    to { transform: scaleY(1); opacity: 1; }
+  }
+  .pc__play {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    background: transparent;
+    color: var(--gold-200);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background 0.35s, color 0.35s;
+  }
+  .pc__play svg { width: 16px; height: 16px; margin-left: 2px; }
+  .pc__play:hover { background: var(--gold-200); color: var(--ink); }
+
+  .pc__list { list-style: none; padding: 0; margin-top: auto; }
+  .pc__ep {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 0.85rem;
+    border-top: 1px solid var(--line);
+    transition: color 0.3s;
+  }
+  .pc__no {
+    font-family: var(--sans);
+    font-size: 0.52rem;
+    letter-spacing: 0.16em;
+    color: var(--gold-700);
+    flex: none;
+    width: 2.6rem;
+  }
+  .pc__epbody { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; }
+  .pc__eptitle {
+    font-family: var(--serif-display);
+    font-size: 1rem;
+    line-height: 1.2;
+    transition: color 0.3s;
+  }
+  .pc__ep:hover .pc__eptitle { color: var(--gold-700); }
+  .pc__epguest {
+    font-family: var(--sans);
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+    color: var(--muted-2);
+  }
+  .pc__dur {
+    font-family: var(--sans);
+    font-size: 0.53rem;
+    letter-spacing: 0.1em;
+    color: var(--muted-2);
+    flex: none;
+  }
+</style>

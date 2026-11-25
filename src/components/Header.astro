@@ -1,0 +1,433 @@
+---
+import { nav, site } from '../data/site.js';
+import { shortDate } from '../data/articles.js';
+
+const today = shortDate(new Date().toISOString().slice(0, 10));
+const path = Astro.url.pathname;
+---
+
+<header class="masthead" id="masthead">
+  <!-- bar atas -->
+  <div class="topbar">
+    <div class="topbar__inner">
+      <span class="topbar__item">
+        <span class="topbar__dot"></span>
+        Edisi {today}
+      </span>
+      <span class="topbar__sep"></span>
+      <span class="topbar__item topbar__hide">Yogyakarta — {site.established}</span>
+      <div class="topbar__right">
+        <a class="topbar__link" href="/tentang">Tentang</a>
+        <a class="topbar__link" href="/iklan">Iklan</a>
+        <a class="topbar__link topbar__cta" href={`tel:${site.phoneHref}`}>
+          Hubungi Redaksi
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- masthead utama -->
+  <div class="masthead__main">
+    <button class="icon-btn menu-toggle" id="menu-toggle" aria-label="Buka menu" aria-expanded="false">
+      <span></span><span></span>
+    </button>
+
+    <a href="/" class="brand" aria-label={`${site.name} — beranda`}>
+      <img src="/logo-ink.png" alt="" class="brand__logo" width="56" height="63" />
+      <span class="brand__text">
+        <span class="brand__name">Swara Bestari</span>
+        <span class="brand__tag">{site.tagline}</span>
+      </span>
+    </a>
+
+    <a class="icon-btn shelf-btn" href="/ruang-baca" aria-label="Ruang baca Anda" title="Ruang baca">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M5 4h4v16H5zM11 4h4v16h-4zM18 4l1.6 6.4-2.5.7L15.5 5z"/>
+      </svg>
+      <span class="shelf-btn__dot" aria-hidden="true"></span>
+    </a>
+
+    <button class="icon-btn search-btn" id="search-open" aria-label="Cari tulisan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m16.5 16.5 4 4"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- navigasi rubrik -->
+  <nav class="nav" id="primary-nav" aria-label="Rubrik">
+    <div class="nav__inner">
+      {nav.map((item, i) => {
+        const active = path === item.href || (item.href !== '/' && path.startsWith(item.href));
+        return (
+          <a href={item.href} class:list={['nav__link', { 'is-active': active }]}>
+            {item.label}
+          </a>
+        );
+      })}
+      <a href="/iklan" class="nav__link nav__link--gold">Ruang Iklan</a>
+    </div>
+  </nav>
+
+  <!-- panel menu mobile -->
+  <div class="mobile-panel" id="mobile-panel" hidden>
+    <div class="mobile-panel__head">
+      <span class="eyebrow">Rubrik</span>
+      <button class="icon-btn" id="menu-close" aria-label="Tutup menu">✕</button>
+    </div>
+    <nav class="mobile-panel__nav" aria-label="Rubrik (seluler)">
+      {nav.map((item, i) => (
+        <a href={item.href} class="mobile-panel__link" style={`--i:${i}`}>
+          <span class="mobile-panel__idx">0{i + 1}</span>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+    <div class="mobile-panel__foot">
+      <a class="btn btn--ghost" href="/iklan">Ruang Iklan <span class="btn__arrow">→</span></a>
+      <a class="mobile-panel__phone" href={`tel:${site.phoneHref}`}>{site.phone}</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    transition: box-shadow 0.4s var(--ease), background 0.4s var(--ease);
+  }
+  .masthead.is-compact {
+    box-shadow: 0 12px 32px -22px rgba(20, 18, 15, 0.55);
+  }
+  /* saat ringkas: masthead utama menyusut, topbar disembunyikan */
+  .masthead.is-compact .topbar {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s var(--ease), opacity 0.3s var(--ease);
+  }
+  .topbar { max-height: 60px; transition: max-height 0.4s var(--ease), opacity 0.3s var(--ease); }
+  .masthead.is-compact .masthead__main { padding-block: 0.55rem; }
+  .masthead.is-compact .brand__logo { width: 32px; }
+  .masthead.is-compact .brand__name { font-size: 1.25rem; }
+  .masthead.is-compact .brand__tag { display: none; }
+  .masthead__main { transition: padding 0.4s var(--ease); }
+  .brand__logo, .brand__name { transition: width 0.4s var(--ease), font-size 0.35s var(--ease); }
+
+  /* ── topbar ── */
+  .topbar {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--sans);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .topbar__inner {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding: 0.6rem var(--gutter);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .topbar__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: rgba(244, 239, 228, 0.66);
+  }
+  .topbar__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 3px rgba(208, 175, 98, 0.18);
+    animation: pulse 3.4s var(--ease) infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+  .topbar__sep {
+    width: 1px;
+    height: 11px;
+    background: rgba(244, 239, 228, 0.18);
+  }
+  .topbar__right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .topbar__link {
+    color: rgba(244, 239, 228, 0.7);
+    transition: color 0.3s var(--ease);
+  }
+  .topbar__link:hover { color: var(--gold-200); }
+  .topbar__cta {
+    color: var(--gold-200);
+    border-bottom: 1px solid rgba(225, 197, 119, 0.35);
+    padding-bottom: 1px;
+  }
+
+  /* ── masthead ── */
+  .masthead__main {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding: clamp(1.1rem, 2.6vw, 2.1rem) var(--gutter);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(0.7rem, 1.6vw, 1.15rem);
+  }
+  .brand__logo {
+    width: clamp(38px, 4.4vw, 56px);
+    height: auto;
+    transition: transform 0.7s var(--ease-out);
+  }
+  .brand:hover .brand__logo {
+    transform: rotate(-3deg) scale(1.04);
+  }
+  .brand__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1;
+  }
+  .brand__name {
+    font-family: var(--serif-display);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 3.8vw, 2.55rem);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding-left: 0.14em;
+  }
+  .brand__tag {
+    font-family: var(--sans);
+    font-size: clamp(0.5rem, 0.85vw, 0.6rem);
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+    margin-top: 0.55em;
+    padding-left: 0.34em;
+    white-space: nowrap;
+  }
+
+  /* ── ikon tombol ── */
+  .icon-btn {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn svg { width: 21px; height: 21px; }
+  .menu-toggle {
+    position: absolute;
+    left: var(--gutter);
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+    gap: 5px;
+    display: none;
+  }
+  .menu-toggle span {
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    background: var(--ink);
+    transition: transform 0.35s var(--ease);
+  }
+  .shelf-btn {
+    position: absolute;
+    right: calc(var(--gutter) + 52px);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+  }
+  .shelf-btn:hover { border-color: var(--gold-600); background: var(--gold-100); }
+  .shelf-btn__dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold-600);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .shelf-btn.has-items .shelf-btn__dot { opacity: 1; }
+  .search-btn {
+    position: absolute;
+    right: var(--gutter);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+  }
+  .search-btn:hover {
+    border-color: var(--gold-600);
+    background: var(--gold-100);
+  }
+
+  /* ── nav ── */
+  .nav {
+    border-top: 1px solid var(--line-soft);
+  }
+  .nav__inner {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(0.5rem, 2.4vw, 2.6rem);
+    flex-wrap: wrap;
+  }
+  .nav__link {
+    position: relative;
+    font-family: var(--sans);
+    font-size: 0.685rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 0.95rem 0.2rem 0.85rem;
+    transition: color 0.3s var(--ease);
+  }
+  .nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1.5px;
+    background: var(--gold-600);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.45s var(--ease-out);
+  }
+  .nav__link:hover { color: var(--ink); }
+  .nav__link:hover::after { transform: scaleX(1); transform-origin: left; }
+  .nav__link.is-active { color: var(--ink); }
+  .nav__link.is-active::after { transform: scaleX(1); }
+  .nav__link--gold {
+    color: var(--gold-700);
+    margin-left: 0.4rem;
+  }
+  .nav__link--gold::before {
+    content: '';
+    position: absolute;
+    inset: 0.55rem -0.7rem 0.5rem;
+    border: 1px solid rgba(176, 135, 54, 0.28);
+    transition: background 0.35s var(--ease), border-color 0.35s var(--ease);
+  }
+  .nav__link--gold:hover::before {
+    background: rgba(208, 175, 98, 0.1);
+    border-color: var(--gold-600);
+  }
+
+  /* ── panel mobile ── */
+  .mobile-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1.5rem var(--gutter) 2.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .mobile-panel[hidden] { display: none; }
+  .mobile-panel__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--line-dark);
+  }
+  .mobile-panel__head .eyebrow { color: var(--gold-200); }
+  .mobile-panel__head .icon-btn { color: var(--paper); font-size: 1.1rem; }
+  .mobile-panel__nav {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1.5rem;
+    flex: 1;
+  }
+  .mobile-panel__link {
+    display: flex;
+    align-items: baseline;
+    gap: 1.1rem;
+    padding: 0.85rem 0;
+    font-family: var(--serif-display);
+    font-size: clamp(1.75rem, 7vw, 2.5rem);
+    letter-spacing: 0.01em;
+    border-bottom: 1px solid var(--line-dark);
+    opacity: 0;
+    transform: translateY(14px);
+    animation: slideIn 0.55s var(--ease-out) forwards;
+    animation-delay: calc(var(--i) * 0.055s + 0.1s);
+  }
+  @keyframes slideIn {
+    to { opacity: 1; transform: none; }
+  }
+  .mobile-panel__idx {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-200);
+  }
+  .mobile-panel__foot {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+  .mobile-panel__phone {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    color: var(--gold-200);
+  }
+
+  @media (max-width: 900px) {
+    .menu-toggle { display: inline-flex; }
+    .nav { display: none; }
+    .topbar__hide { display: none; }
+    .topbar__inner { justify-content: space-between; }
+    .topbar__sep { display: none; }
+    .topbar__right { gap: 1rem; }
+    .topbar__link:first-child { display: none; }
+  }
+  @media (max-width: 560px) {
+    .brand__logo { width: 34px; }
+    .brand__tag { letter-spacing: 0.22em; }
+    .topbar__cta { display: none; }
+  }
+</style>

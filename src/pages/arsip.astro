@@ -1,0 +1,195 @@
+---
+import Base from '../layouts/Base.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { articles, latest, formatDate } from '../data/articles.js';
+import { rubrik, rubrikBySlug } from '../data/site.js';
+
+const sorted = [...articles].sort((a, b) => new Date(b.date) - new Date(a.date));
+const years = [...new Set(sorted.map((a) => a.date.slice(0, 4)))];
+const months = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+];
+
+// kelompokkan per tahun-bulan
+const grouped: Record<string, any[]> = {};
+sorted.forEach((a) => {
+  const key = a.date.slice(0, 7);
+  (grouped[key] ||= []).push(a);
+});
+---
+
+<Base title="Arsip" description="Seluruh arsip tulisan Swara Bestari—kronik, esai, diskursus, khazanah, seni, dan humaniora.">
+  <header class="arh">
+    <div class="wrap">
+      <span class="eyebrow eyebrow--light">Arsip</span>
+      <h1 class="arh__title">Semua yang pernah<br /><em>kami terbitkan.</em></h1>
+      <div class="arh__bar">
+        <div class="arh__filter" role="group" aria-label="Filter rubrik">
+          <button class="arh__chip is-active" data-filter="all">Semua</button>
+          {rubrik.map((r) => (
+            <button class="arh__chip" data-filter={r.slug}>{r.name}</button>
+          ))}
+        </div>
+        <span class="arh__count" id="arh-count">{articles.length} tulisan</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="wrap">
+      {Object.entries(grouped).map(([key, list], gi) => {
+        const [y, m] = key.split('-');
+        return (
+          <section class="ar__group" data-group={key}>
+            <div class="ar__ghead">
+              <h2 class="ar__gtitle">
+                <span class="ar__gmonth">{months[parseInt(m) - 1]}</span>
+                <span class="ar__gyear">{y}</span>
+              </h2>
+              <span class="ar__gcount">{list.length} tulisan</span>
+            </div>
+            <div class="ar__grid">
+              {list.map((a) => (
+                <div class="ar__cell" data-rubrik={a.rubrik}>
+                  <ArticleCard article={a} variant="standard" />
+                </div>
+              ))}
+            </div>
+            {gi === 0 && (
+              <div class="ar__ad">
+                <AdSlot format="leaderboard" />
+              </div>
+            )}
+          </section>
+        );
+      })}
+      <div class="ar__empty" id="ar-empty" hidden>
+        <p>Belum ada tulisan pada rubrik ini.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('.arh__chip');
+  const cells = document.querySelectorAll<HTMLElement>('.ar__cell');
+  const groups = document.querySelectorAll<HTMLElement>('.ar__group');
+  const count = document.getElementById('arh-count');
+  const empty = document.getElementById('ar-empty');
+
+  function apply(filter: string) {
+    let visible = 0;
+    chips.forEach((c) => c.classList.toggle('is-active', c.dataset.filter === filter));
+    cells.forEach((cell) => {
+      const show = filter === 'all' || cell.dataset.rubrik === filter;
+      cell.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    groups.forEach((g) => {
+      const any = Array.from(g.querySelectorAll<HTMLElement>('.ar__cell')).some(
+        (c) => c.style.display !== 'none'
+      );
+      g.style.display = any ? '' : 'none';
+    });
+    if (count) count.textContent = `${visible} tulisan`;
+    if (empty) empty.hidden = visible > 0;
+  }
+
+  chips.forEach((c) => c.addEventListener('click', () => apply(c.dataset.filter || 'all')));
+
+  // filter via ?tag= atau ?rubrik=
+  const params = new URLSearchParams(location.search);
+  const r = params.get('rubrik');
+  if (r) apply(r);
+</script>
+
+<style>
+  .arh {
+    background: var(--ink);
+    color: var(--paper);
+    padding-block: clamp(2.75rem, 6vw, 4.5rem) clamp(1.75rem, 3vw, 2.5rem);
+  }
+  .arh__title {
+    font-family: var(--serif-display);
+    font-size: clamp(2.3rem, 5.4vw, 4.2rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.028em;
+    margin-block: 0.9rem 2rem;
+  }
+  .arh__title em { color: var(--gold-200); }
+  .arh__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line-dark);
+  }
+  .arh__filter { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .arh__chip {
+    background: transparent;
+    border: 1px solid var(--line-dark);
+    color: rgba(244, 239, 228, 0.65);
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0.55em 1em;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+  }
+  .arh__chip:hover { color: var(--gold-200); border-color: var(--gold-600); }
+  .arh__chip.is-active { background: var(--gold-200); color: var(--ink); border-color: var(--gold-200); }
+  .arh__count {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(244, 239, 228, 0.45);
+  }
+
+  .ar__group { padding-bottom: clamp(2rem, 4vw, 3rem); }
+  .ar__ghead {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 0.7rem;
+    margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+  }
+  .ar__gtitle { display: flex; align-items: baseline; gap: 0.6rem; }
+  .ar__gmonth {
+    font-family: var(--serif-display);
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+  .ar__gyear {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    color: var(--gold-700);
+  }
+  .ar__gcount {
+    margin-left: auto;
+    font-family: var(--sans);
+    font-size: 0.56rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+  .ar__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.25rem, 2.5vw, 2.25rem);
+  }
+  .ar__ad { margin-top: clamp(1.5rem, 3vw, 2.5rem); }
+  .ar__empty { text-align: center; padding: 3rem 0; color: var(--muted); font-style: italic; }
+
+  @media (max-width: 900px) { .ar__grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .ar__grid { grid-template-columns: 1fr; } }
+</style>

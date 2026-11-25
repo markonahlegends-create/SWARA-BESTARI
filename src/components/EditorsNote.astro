@@ -1,0 +1,155 @@
+---
+// Surat dari pemimpin redaksi — tanda tangan manusia di balik mesin.
+---
+<section class="en">
+  <div class="wrap en__inner">
+    <div class="en__portrait" aria-hidden="true">
+      <div class="en__frame">
+        <img src="/img/poet-portrait.jpg" alt="" loading="lazy" />
+      </div>
+      <span class="en__caption">Saraswati Dewi<br /><em>Pemimpin Redaksi</em></span>
+    </div>
+
+    <div class="en__body">
+      <div class="en__head">
+        <span class="eyebrow">Surat dari Redaksi</span>
+        <span class="en__no">Edisi No. 84</span>
+      </div>
+      <h2 class="en__title">
+        Tentang hal-hal yang<br />
+        <em>bertahan</em> meski tak diminta.
+      </h2>
+      <p>
+        Edisi ini disusun di antara dua kepulangan: seorang pencatat arsip yang
+        menemukan kembali rel kereta yang tak lagi dilayani, dan seorang penenun
+        yang menyimpan motif terakhir di ujung jarinya.
+      </p>
+      <p>
+        Kami tidak sedang meromantisasi kepunahan. Kami hanya menolak menyebutnya
+        selesai. Selama masih ada yang menulis, memotret, menenun, atau sekadar
+        mengingat—selama itu pula ada yang bisa diperiksa ulang, dibantah, dan
+        diturunkan ke generasi berikutnya.
+      </p>
+      <p class="en__sign">— Saraswati</p>
+      <a href="/tentang" class="en__more">Baca surat lengkap <span>→</span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .en {
+    padding-block: clamp(3rem, 6vw, 5.5rem);
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(ellipse 60% 80% at 100% 0%, rgba(208, 175, 98, 0.09), transparent 65%),
+      var(--paper);
+  }
+  .en__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .en__portrait { display: flex; flex-direction: column; gap: 1rem; }
+  .en__frame {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--ink-2);
+    outline: 1px solid var(--gold);
+    outline-offset: 10px;
+  }
+  .en__frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(20, 18, 15, 0.4), transparent 55%);
+  }
+  .en__frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.8) contrast(1.04);
+    transition: transform 2s var(--ease-out);
+  }
+  .en__portrait:hover .en__frame img { transform: scale(1.03); }
+  .en__caption {
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    padding-left: 2px;
+  }
+  .en__caption em {
+    font-family: var(--serif-body);
+    font-style: italic;
+    font-size: 0.78rem;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    color: var(--gold-700);
+  }
+
+  .en__body { max-width: 62ch; }
+  .en__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .en__no {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+  .en__title {
+    font-family: var(--serif-display);
+    font-size: clamp(1.9rem, 3.8vw, 3rem);
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: -0.024em;
+    margin-block: 1.35rem 1.35rem;
+  }
+  .en__title em { color: var(--gold-700); }
+  .en__body > p {
+    font-size: clamp(0.98rem, 1.2vw, 1.06rem);
+    line-height: 1.78;
+    color: var(--ink-soft);
+    margin-bottom: 1.1em;
+  }
+  .en__sign {
+    font-family: var(--serif-display) !important;
+    font-style: italic;
+    font-size: 1.5rem !important;
+    color: var(--gold-700) !important;
+    margin-top: 1.75rem !important;
+  }
+  .en__more {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 0.5rem;
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 0.25rem;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .en__more:hover { color: var(--gold-700); border-color: var(--gold-700); }
+  .en__more span { transition: transform 0.4s var(--ease-out); }
+  .en__more:hover span { transform: translateX(4px); }
+
+  @media (max-width: 860px) {
+    .en__inner { grid-template-columns: 1fr; }
+    .en__portrait { max-width: 300px; }
+  }
+</style>

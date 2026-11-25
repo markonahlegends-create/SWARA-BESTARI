@@ -1,0 +1,63 @@
+---
+interface Props {
+  items: { id: string; text: string }[];
+}
+const { items } = Astro.props;
+---
+<nav class="toc" aria-label="Daftar isi">
+  <span class="toc__label">Dalam tulisan ini</span>
+  <ol class="toc__list">
+    {items.map((it, i) => (
+      <li>
+        <a href={`#${it.id}`} class="toc__link">
+          <span class="toc__num">{String(i + 1).padStart(2, '0')}</span>
+          <span class="toc__text">{it.text}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  .toc {
+    border: 1px solid var(--line);
+    background: var(--paper-2);
+    padding: 1.35rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .toc__label {
+    font-family: var(--sans);
+    font-size: 0.54rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+    display: block;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 0.35rem;
+  }
+  .toc__list { list-style: none; padding: 0; }
+  .toc__link {
+    display: flex;
+    gap: 0.85rem;
+    padding-block: 0.55rem;
+    align-items: baseline;
+    border-bottom: 1px solid rgba(216, 205, 182, 0.5);
+  }
+  .toc__list li:last-child .toc__link { border-bottom: 0; }
+  .toc__num {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--gold-600);
+    flex: none;
+  }
+  .toc__text {
+    font-family: var(--serif-display);
+    font-size: 1.02rem;
+    line-height: 1.25;
+    color: var(--ink-soft);
+    transition: color 0.3s;
+  }
+  .toc__link:hover .toc__text { color: var(--gold-700); }
+</style>

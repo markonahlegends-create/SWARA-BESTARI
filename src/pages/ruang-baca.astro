@@ -1,0 +1,241 @@
+---
+import Base from '../layouts/Base.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { latest, bySlug } from '../data/articles.js';
+import { rubrik } from '../data/site.js';
+---
+<Base title="Ruang Baca Anda" description="Bacaan yang Anda simpan, riwayat, dan rekomendasi personal.">
+  <header class="rb">
+    <div class="wrap">
+      <span class="eyebrow eyebrow--light">Ruang Baca</span>
+      <h1 class="rb__title">Meja kerja<br /><em>Anda.</em></h1>
+      <p class="rb__desc">
+        Tersimpan di peramban Anda saja—tanpa akun, tanpa pelacakan.
+        Tandai tulisan dengan ikon <strong>⚑</strong> saat membacanya.
+      </p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="wrap rbg">
+      <div class="rbc">
+        <!-- simpanan -->
+        <div class="rbsec">
+          <div class="rbsec__head">
+            <h2>Tersimpan</h2>
+            <span class="rbsec__count" id="saved-count">0 tulisan</span>
+          </div>
+          <div id="saved-list" class="rblist"></div>
+          <div class="rbempty" id="saved-empty">
+            <p class="rbempty__mark" aria-hidden="true">⚑</p>
+            <p>Belum ada yang tersimpan.</p>
+            <p class="rbempty__hint">
+              Buka sebuah tulisan dan klik tombol simpan di bilah berbagi.
+            </p>
+            <a href="/" class="btn btn--ghost">Jelajahi edisi terbaru</a>
+          </div>
+        </div>
+
+        <!-- riwayat -->
+        <div class="rbsec">
+          <div class="rbsec__head">
+            <h2>Baru dibaca</h2>
+            <button class="rbsec__clear" id="clear-history" type="button">Hapus riwayat</button>
+          </div>
+          <div id="history-list" class="rblist rblist--hist"></div>
+          <p class="rbempty__hint" id="history-empty">Riwayat membaca akan muncul di sini.</p>
+        </div>
+
+        <!-- progres -->
+        <div class="rbsec">
+          <div class="rbsec__head">
+            <h2>Jelajah Rubrik</h2>
+            <span class="rbsec__count" id="rubrik-stat">—</span>
+          </div>
+          <div class="rbgrid" id="rubrik-progress"></div>
+        </div>
+      </div>
+
+      <aside class="rbr">
+        <div class="rbcard">
+          <span class="eyebrow">Disarankan untuk Anda</span>
+          <p class="rbcard__desc" id="rec-desc">
+            Mulai membaca beberapa tulisan; kami akan menyusun saran berdasarkan rubrik favorit Anda.
+          </p>
+          <div id="rec-list" class="rbrec"></div>
+        </div>
+        <AdSlot format="halfpage" />
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<script type="application/json" id="article-meta" set:html={JSON.stringify(
+  latest.map((a) => ({ slug: a.slug, title: a.title, rubrik: a.rubrik, image: a.image, reading: a.reading, dek: a.dek }))
+)}></script>
+<script type="application/json" id="rubrik-meta" set:html={JSON.stringify(rubrik.map((r) => ({ slug: r.slug, name: r.name })))}></script>
+
+<script>
+  type Meta = { slug: string; title: string; rubrik: string; image: string; reading: number; dek: string };
+
+  const meta: Meta[] = JSON.parse(document.getElementById('article-meta')?.textContent || '[]');
+  const rubs: { slug: string; name: string }[] = JSON.parse(
+    document.getElementById('rubrik-meta')?.textContent || '[]'
+  );
+  const bySlug = new Map(meta.map((m) => [m.slug, m]));
+  const rubName = new Map(rubs.map((r) => [r.slug, r.name]));
+
+  const getSaved = (): string[] => JSON.parse(localStorage.getItem('sb-saved') || '[]');
+  const getHist = (): { slug: string; at: number }[] =>
+    JSON.parse(localStorage.getItem('sb-history') || '[]');
+
+  function cardHtml(m: Meta, extra = '') {
+    return `<a class="rbitem" href="/tulisan/${m.slug}">
+      <div class="rbitem__img"><img src="${m.image}" alt="" loading="lazy"></div>
+      <div class="rbitem__body">
+        <span class="rbitem__rub">${rubName.get(m.rubrik) || m.rubrik}</span>
+        <span class="rbitem__title">${m.title}</span>
+        <span class="rbitem__meta">${m.reading} menit baca ${extra}</span>
+      </div>
+    </a>`;
+  }
+
+  const savedList = document.getElementById('saved-list');
+  const savedEmpty = document.getElementById('saved-empty');
+  const savedCount = document.getElementById('saved-count');
+  function renderSaved() {
+    const saved = getSaved().map((s) => bySlug.get(s)).filter(Boolean) as Meta[];
+    if (savedCount) savedCount.textContent = `${saved.length} tulisan`;
+    if (savedList) savedList.innerHTML = saved.map((m) => cardHtml(m)).join('');
+    if (savedEmpty) savedEmpty.style.display = saved.length ? 'none' : '';
+  }
+
+  const histList = document.getElementById('history-list');
+  const histEmpty = document.getElementById('history-empty');
+  function renderHist() {
+    const hist = getHist().map((h) => bySlug.get(h.slug)).filter(Boolean) as Meta[];
+    if (histList) histList.innerHTML = hist.map((m) => cardHtml(m)).join('');
+    if (histEmpty) histEmpty.style.display = hist.length ? 'none' : '';
+  }
+
+  const progress = document.getElementById('rubrik-progress');
+  const stat = document.getElementById('rubrik-stat');
+  const recList = document.getElementById('rec-list');
+  const recDesc = document.getElementById('rec-desc');
+
+  function renderProgress() {
+    const hist = getHist();
+    const counts = new Map<string, number>();
+    hist.forEach((h) => {
+      const m = bySlug.get(h.slug);
+      if (m) counts.set(m.rubrik, (counts.get(m.rubrik) || 0) + 1);
+    });
+    const total = hist.length;
+    if (stat) stat.textContent = total ? `${total} tulisan dibaca` : '—';
+    if (progress) {
+      progress.innerHTML = rubs
+        .map((r) => {
+          const c = counts.get(r.slug) || 0;
+          const pct = total ? Math.round((c / total) * 100) : 0;
+          return `<div class="rbprog">
+            <div class="rbprog__top">
+              <span class="rbprog__name">${r.name}</span>
+              <span class="rbprog__n">${c}</span>
+            </div>
+            <div class="rbprog__bar"><span style="width:${pct}%"></span></div>
+          </div>`;
+        })
+        .join('');
+    }
+
+    // rekomendasi berbasis rubrik terfavorit
+    const entries = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+    const fav = entries[0]?.[0];
+    const saved = new Set(getSaved());
+    const read = new Set(hist.map((h) => h.slug));
+    if (fav && recList && recDesc) {
+      recDesc.textContent = `Karena Anda banyak membaca ${rubName.get(fav)}.`;
+      const recs = meta.filter((m) => m.rubrik === fav && !read.has(m.slug) && !saved.has(m.slug)).slice(0, 3);
+      recList.innerHTML = recs.length ? recs.map((m) => cardHtml(m)).join('') : '<p class="rbempty__hint">Sudah membaca semuanya di rubrik ini.</p>';
+    } else if (recList && recDesc) {
+      recDesc.textContent = 'Mulai membaca beberapa tulisan; kami akan menyusun saran berdasarkan rubrik favorit Anda.';
+      recList.innerHTML = meta.slice(0, 3).map((m) => cardHtml(m)).join('');
+    }
+  }
+
+  document.getElementById('clear-history')?.addEventListener('click', () => {
+    localStorage.removeItem('sb-history');
+    renderHist();
+    renderProgress();
+  });
+
+  renderSaved();
+  renderHist();
+  renderProgress();
+</script>
+
+<style>
+  .rb { background: var(--ink); color: var(--paper); padding-block: clamp(2.75rem, 5.5vw, 4.5rem); }
+  .rb__title {
+    font-family: var(--serif-display);
+    font-size: clamp(2.3rem, 5.2vw, 4rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.028em;
+    margin-block: 0.9rem 1.15rem;
+  }
+  .rb__title em { color: var(--gold-200); }
+  .rb__desc { color: rgba(244, 239, 228, 0.58); max-width: 54ch; line-height: 1.7; }
+  .rb__desc strong { color: var(--gold-200); }
+
+  .rbg { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; }
+  .rbc { display: flex; flex-direction: column; gap: clamp(1.75rem, 3.5vw, 2.75rem); }
+  .rbsec__head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+    border-bottom: 1px solid var(--ink); padding-bottom: 0.7rem; margin-bottom: 1rem;
+  }
+  .rbsec__head h2 { font-family: var(--serif-display); font-size: clamp(1.3rem, 2.2vw, 1.7rem); font-weight: 500; letter-spacing: -0.015em; }
+  .rbsec__count { font-family: var(--sans); font-size: 0.56rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted-2); }
+  .rbsec__clear {
+    background: none; border: 0; cursor: pointer; padding: 0;
+    font-family: var(--sans); font-size: 0.56rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted-2); border-bottom: 1px solid var(--line); transition: color 0.3s, border-color 0.3s;
+  }
+  .rbsec__clear:hover { color: var(--gold-700); border-color: var(--gold-700); }
+
+  .rblist { display: flex; flex-direction: column; }
+  .rbempty { text-align: center; padding: 2.5rem 1rem; border: 1px dashed var(--line); }
+  .rbempty__mark { font-size: 1.6rem; color: var(--gold); margin-bottom: 0.5rem; }
+  .rbempty p { color: var(--ink-soft); font-style: italic; }
+  .rbempty__hint { font-family: var(--sans); font-style: normal !important; font-size: 0.65rem; letter-spacing: 0.08em; color: var(--muted-2) !important; margin-block: 0.5rem 1rem; }
+  .rbempty .btn { font-size: 0.6rem; }
+
+  .rbgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.75rem; }
+  .rbprog__top { display: flex; justify-content: space-between; font-family: var(--sans); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.35rem; }
+  .rbprog__n { color: var(--gold-700); }
+  .rbprog__bar { height: 2px; background: var(--line); }
+  .rbprog__bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--gold-700), var(--gold-200)); }
+
+  .rbr { display: flex; flex-direction: column; gap: 1.5rem; position: sticky; top: 6.5rem; }
+  .rbcard { border: 1px solid var(--line); background: var(--paper-2); padding: 1.35rem; }
+  .rbcard__desc { font-size: 0.85rem; line-height: 1.6; color: var(--muted); margin-block: 0.6rem 1rem; }
+  .rbrec { display: flex; flex-direction: column; }
+
+  .rbitem { display: flex; gap: 1rem; padding-block: 0.9rem; border-bottom: 1px solid var(--line); align-items: center; }
+  .rbitem__img { flex: none; width: 76px; aspect-ratio: 4/3; overflow: hidden; background: var(--ink-2); }
+  .rbitem__img img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.9); transition: transform 1.2s var(--ease-out); }
+  .rbitem:hover .rbitem__img img { transform: scale(1.06); }
+  .rbitem__body { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+  .rbitem__rub { font-family: var(--sans); font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-700); }
+  .rbitem__title { font-family: var(--serif-display); font-size: 1.02rem; line-height: 1.2; transition: color 0.3s; }
+  .rbitem:hover .rbitem__title { color: var(--gold-700); }
+  .rbitem__meta { font-family: var(--sans); font-size: 0.52rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted-2); }
+
+  @media (max-width: 960px) {
+    .rbg { grid-template-columns: 1fr; }
+    .rbr { position: static; }
+  }
+  @media (max-width: 560px) {
+    .rbgrid { grid-template-columns: 1fr; }
+  }
+</style>
