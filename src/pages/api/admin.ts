@@ -34,7 +34,12 @@ export const prerender = false;
 
 const REPO = process.env.GITHUB_REPO || 'markonahlegends-create/SWARA-BESTARI';
 const BRANCH = process.env.GITHUB_BRANCH || 'main';
-const GH_TOKEN = process.env.GITHUB_TOKEN || '';
+/**
+ * Token dipangkas dari spasi & baris baru. Saat menempel nilai panjang di
+ * kolom Environment Variables, karakter tak terlihat sering ikut terbawa —
+ * dan GitHub menolaknya sebagai 401 seolah tokennya salah.
+ */
+const GH_TOKEN = (process.env.GITHUB_TOKEN || '').trim();
 const SECRET = process.env.ADMIN_SECRET || '';
 const PASSWORD = process.env.ADMIN_PASSWORD || '';
 const COOKIE = 'sb_admin';
@@ -122,10 +127,25 @@ async function readFile(file) {
     );
   }
   if (res.status === 404) return { data: null, sha: null };
-  if (res.status === 401 || res.status === 403) {
+  if (res.status === 401) {
     throw new Error(
-      `GITHUB_TOKEN ditolak GitHub (${res.status}). Pastikan token masih berlaku ` +
-        `dan punya izin Contents: Read and write pada ${REPO}.`
+      `GitHub tidak mengenali GITHUB_TOKEN (401). Token salah salin, ` +
+        `terpotong, atau sudah kedaluwarsa/dicabut. Buat token baru di ` +
+        `GitHub → Settings → Developer settings → Fine-grained tokens, ` +
+        `lalu tempel ulang tanpa spasi di ujungnya.`
+    );
+  }
+  if (res.status === 403) {
+    throw new Error(
+      `GitHub menolak karena izin kurang (403). Token ini dikenali, tetapi ` +
+        `belum punya akses ke ${REPO} atau izin Contents belum di-set ` +
+        `Read and write.`
+    );
+  }
+  if (res.status === 404) {
+    throw new Error(
+      `Repositori atau berkas tidak ditemukan (404). Periksa GITHUB_REPO ` +
+        `dan GITHUB_BRANCH, atau pastikan token punya akses ke ${REPO}.`
     );
   }
   if (!res.ok) throw new Error(`GitHub baca ${file}: ${res.status} ${await res.text()}`);

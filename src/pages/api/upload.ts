@@ -22,7 +22,7 @@ export const prerender = false;
 
 const REPO = process.env.GITHUB_REPO || 'markonahlegends-create/SWARA-BESTARI';
 const BRANCH = process.env.GITHUB_BRANCH || 'main';
-const GH_TOKEN = process.env.GITHUB_TOKEN || '';
+const GH_TOKEN = (process.env.GITHUB_TOKEN || '').trim(); // lihat catatan di admin.ts
 const SECRET = process.env.ADMIN_SECRET || '';
 const PASSWORD = process.env.ADMIN_PASSWORD || '';
 const COOKIE = 'sb_admin';
