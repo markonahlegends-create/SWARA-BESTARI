@@ -9,23 +9,51 @@ import { site } from '../data/site.js';
 interface Props {
   title: string;
   description?: string;
+  /** Jalur gambar pratinjau (relatif, mis. /og/beranda.jpg). */
   image?: string;
   bodyClass?: string;
   article?: boolean;
   noRail?: boolean;
+  /** Untuk artikel: tampilkan tanggal & penulis pada kartu tautan. */
+  published?: string;
+  author?: string;
 }
 
 const {
   title,
   description = site.description,
-  image = '/img/hero-kronik.jpg',
+  image = '/og/beranda.jpg',
   bodyClass = '',
   article = false,
   noRail = false,
+  published,
+  author,
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://swarabestari.id');
-const ogImage = new URL(image, Astro.site ?? 'https://swarabestari.id');
+/**
+ * ── ASAL URL (PENTING) ──────────────────────────────────────
+ * Thumbnail tautan hanya muncul bila og:image berupa URL ABSOLUT yang
+ * benar-benar bisa diunduh publik. Sebelumnya semua og:image menunjuk
+ * ke https://swarabestari.id — domain yang belum pernah aktif — sehingga
+ * WhatsApp/Facebook gagal mengambil gambar dan kartu tautan tampil kosong.
+ *
+ * Urutan prioritas:
+ *   1. SITE_URL dari environment (dapat diisi domain sendiri nanti)
+ *   2. Domain produksi Vercel yang memang sudah hidup
+ *   3. astro.config `site`
+ */
+const envUrl =
+  import.meta.env.PUBLIC_SITE_URL ||
+  import.meta.env.SITE_URL ||
+  (typeof process !== 'undefined' ? process.env.PUBLIC_SITE_URL : undefined);
+
+const ORIGIN = (envUrl || 'https://swara-bestari.vercel.app').replace(/\/$/, '');
+const abs = (p: string) => new URL(p, ORIGIN).href;
+
+const canonical = abs(Astro.url.pathname);
+const ogImage = abs(image);
+
+const titleTag = title === site.name ? title : `${title} — ${site.name}`;
 ---
 
 <!doctype html>
@@ -37,41 +65,100 @@ const ogImage = new URL(image, Astro.site ?? 'https://swarabestari.id');
     <link rel="icon" type="image/png" sizes="128x128" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <title>{title === site.name ? title : `${title} — ${site.name}`}</title>
+    <title>{titleTag}</title>
     <meta name="description" content={description} />
     <meta name="author" content={site.name} />
     <meta name="theme-color" content="#14120f" />
     <link rel="canonical" href={canonical} />
 
+    <!-- Reveal hanya aktif bila JS berjalan. Tanpa JS (atau bila bundel
+         gagal dimuat), konten tetap terlihat penuh — tidak ada "klap klip". -->
+    <script is:inline>
+      document.documentElement.classList.add('js-reveal');
+    </script>
+
+    <!-- ════════ KARTU TAUTAN ════════ -->
     <meta property="og:type" content={article ? 'article' : 'website'} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="id_ID" />
+
+    <!-- Ukuran eksplisit: WhatsApp & Telegram memakainya untuk memutuskan
+         tata letak kartu sebelum gambar selesai diunduh. -->
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:secure_url" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
+
+    {published && <meta property="article:published_time" content={published} />}
+    {author && <meta property="article:author" content={author} />}
+    {article && <meta property="article:section" content="Kebudayaan" />}
+
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={title} />
 
     <link rel="preload" href="/fonts/bodoni-moda-var.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/spectral-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/jost-var.woff2" as="font" type="font/woff2" crossorigin />
 
-    <script type="application/ld+json" is:inline set:html={JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': article ? 'NewsArticle' : 'WebSite',
-      name: site.name,
-      headline: article ? title : undefined,
-      description,
-      url: canonical.href,
-      publisher: {
-        '@type': 'Organization',
-        name: site.name,
-        logo: new URL('/logo-ink.png', Astro.site ?? 'https://swarabestari.id').href,
-      },
-    })} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(
+      article
+        ? {
+            '@context': 'https://schema.org',
+            '@type': 'NewsArticle',
+            headline: title,
+            description,
+            image: [ogImage],
+            url: canonical,
+            datePublished: published,
+            author: { '@type': 'Person', name: author || site.name },
+            publisher: {
+              '@type': 'Organization',
+              name: site.name,
+              logo: {
+                '@type': 'ImageObject',
+                url: abs('/logo-ink.png'),
+                width: 512,
+                height: 512,
+              },
+            },
+            mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+          }
+        : {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: site.name,
+            alternateName: 'Swara Bestari',
+            description,
+            url: ORIGIN,
+            image: ogImage,
+            publisher: {
+              '@type': 'Organization',
+              name: site.name,
+              url: ORIGIN,
+              logo: {
+                '@type': 'ImageObject',
+                url: abs('/logo-ink.png'),
+                width: 512,
+                height: 512,
+              },
+              contactPoint: {
+                '@type': 'ContactPoint',
+                telephone: site.phoneHref,
+                contactType: 'editorial',
+                email: site.email,
+                availableLanguage: ['id'],
+              },
+            },
+          }
+    )} />
   </head>
   <body class={`grain ${bodyClass}`}>
     <a class="skip" href="#utama">Lompat ke isi</a>

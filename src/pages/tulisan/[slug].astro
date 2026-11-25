@@ -42,18 +42,27 @@ for (const block of body) {
     }
   }
 }
+// Dimensi intrinsik gambar: mencegah layout shift saat gambar dimuat.
+const IMG_SIZES: Record<string, [number, number]> = {'art-gallery.jpg':[1400,939],'cover-current.jpg':[900,1117],'diskursus-forum.jpg':[1400,939],'esai-library.jpg':[1000,1241],'hero-kronik.jpg':[1800,1005],'humaniora-hands.jpg':[1400,939],'jejak-archive.jpg':[1400,939],'khazanah-temple.jpg':[1600,1073],'poet-portrait.jpg':[900,1117],'seni-brush.jpg':[1400,939]};
+const imgW = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[0];
+const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1];
 ---
 
 <Base
   title={article.title}
   description={article.dek}
-  image={article.image}
+  image={`/og/${article.slug}.jpg`}
   article={true}
+  published={new Date(article.date + 'T09:00:00+07:00').toISOString()}
+  author={article.author}
 >
   <!-- ═════════ HEADER ARTIKEL ═════════ -->
   <header class="ah">
     <div class="ah__bg" aria-hidden="true">
-      <img src={article.image} alt="" />
+      <img src={article.image} alt="" /
+            width={imgW(article.image)}
+            height={imgH(article.image)}
+          />
     </div>
     <div class="wrap wrap--narrow ah__inner">
       <nav class="crumbs" aria-label="Jejak">
@@ -83,7 +92,10 @@ for (const block of body) {
   <!-- ═════════ GAMBAR UTAMA ═════════ -->
   <figure class="ahero">
     <div class="ahero__frame">
-      <img src={article.image} alt={article.imageAlt} fetchpriority="high" />
+      <img src={article.image} alt={article.imageAlt} fetchpriority="high" /
+            width={imgW(article.image)}
+            height={imgH(article.image)}
+          />
     </div>
     <figcaption class="wrap wrap--narrow ahero__cap">
       <span>{article.imageAlt}</span>

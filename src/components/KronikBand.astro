@@ -2,6 +2,10 @@
 import { byRubrik, formatDate } from '../data/articles.js';
 import AdSlot from './AdSlot.astro';
 const posts = byRubrik('kronik');
+// Dimensi intrinsik gambar: mencegah layout shift saat gambar dimuat.
+const IMG_SIZES: Record<string, [number, number]> = {'art-gallery.jpg':[1400,939],'cover-current.jpg':[900,1117],'diskursus-forum.jpg':[1400,939],'esai-library.jpg':[1000,1241],'hero-kronik.jpg':[1800,1005],'humaniora-hands.jpg':[1400,939],'jejak-archive.jpg':[1400,939],'khazanah-temple.jpg':[1600,1073],'poet-portrait.jpg':[900,1117],'seni-brush.jpg':[1400,939]};
+const imgW = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[0];
+const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1];
 ---
 <section class="kb">
   <div class="wrap">
@@ -20,7 +24,10 @@ const posts = byRubrik('kronik');
       {posts.map((a, i) => (
         <a href={`/tulisan/${a.slug}`} class="kb__card" data-reveal style={`--d:${i * 0.07}s`}>
           <div class="kb__media">
-            <img src={a.image} alt={a.imageAlt} loading="lazy" />
+            <img src={a.image} alt={a.imageAlt} loading="lazy" /
+            width={imgW(a.image)}
+            height={imgH(a.image)}
+          />
           </div>
           <div class="kb__meta">
             <span class="kb__date">{formatDate(a.date)}</span>

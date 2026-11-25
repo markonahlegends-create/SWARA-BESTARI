@@ -50,14 +50,20 @@ if (revealEls.length) {
 const parallaxEls = document.querySelectorAll<HTMLElement>('[data-parallax]');
 if (parallaxEls.length && !prefersReduced) {
   let ticking = false;
+  const last = new Map<HTMLElement, number>();
   const run = () => {
     const vh = window.innerHeight;
     parallaxEls.forEach((el) => {
       const r = el.getBoundingClientRect();
-      if (r.bottom < -200 || r.top > vh + 200) return;
+      if (r.bottom < -100 || r.top > vh + 100) return;
       const speed = parseFloat(el.dataset.parallax || '0.12');
       const center = r.top + r.height / 2 - vh / 2;
-      el.style.transform = `translate3d(0, ${(-center * speed).toFixed(2)}px, 0)`;
+      const y = -center * speed;
+      // Tulis transform hanya bila bergeser lebih dari 0,5px.
+      // Pergeseran sub-piksel memaksa repaint tanpa hasil yang kasat mata.
+      if (Math.abs((last.get(el) ?? Infinity) - y) < 0.5) return;
+      last.set(el, y);
+      el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`;
     });
     ticking = false;
   };
@@ -244,20 +250,32 @@ if (track) {
   track.addEventListener('mouseleave', () => (track.style.animationPlayState = 'running'));
 }
 
-/* ── 9. HEADER: sembunyikan saat gulir jauh ke bawah ──────── */
+/* ── 9. HEADER: ringkas saat gulir turun ──────────────────────
+   Hanya menambah/menghapus kelas saat status BENAR-BENAR berubah.
+   Versi lama memanggil classList.add/remove pada setiap frame gulir,
+   yang memaksa peramban mengurai ulang gaya header terus-menerus —
+   sebagian dari penyebab layar terasa berkedip. */
 const masthead = document.getElementById('masthead');
-let lastY = window.scrollY;
 if (masthead) {
+  let lastY = window.scrollY;
+  let compact = false;
+  const threshold = 200;
+  const hysteresis = 40;
+
   window.addEventListener(
     'scroll',
     () => {
       const y = window.scrollY;
-      if (y > 260 && y > lastY) masthead.classList.add('is-compact');
-      else masthead.classList.remove('is-compact');
+      const next = compact ? y > threshold - hysteresis : y > threshold;
+      if (next !== compact) {
+        compact = next;
+        masthead.classList.toggle('is-compact', compact);
+      }
       lastY = y;
     },
     { passive: true }
   );
+  void lastY;
 }
 
 /* ── 10. INDIKATOR RUANG BACA ─────────────────────────────── */
@@ -281,5 +299,15 @@ document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
       e.preventDefault();
       target.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
     }
+  });
+});
+
+/* ── 12. HEMAT DAYA: jeda animasi saat tab tak terlihat ───────
+   Marquee dan denyut topbar berhenti saat tab disembunyikan,
+   sehingga tidak ada kerja GPU tersisa di latar belakang. */
+document.addEventListener('visibilitychange', () => {
+  const paused = document.hidden;
+  document.querySelectorAll<HTMLElement>('[data-marquee]').forEach((el) => {
+    el.style.animationPlayState = paused ? 'paused' : 'running';
   });
 });

@@ -1,11 +1,18 @@
 ---
 // Surat dari pemimpin redaksi — tanda tangan manusia di balik mesin.
+// Dimensi intrinsik gambar: mencegah layout shift saat gambar dimuat.
+const IMG_SIZES: Record<string, [number, number]> = {'art-gallery.jpg':[1400,939],'cover-current.jpg':[900,1117],'diskursus-forum.jpg':[1400,939],'esai-library.jpg':[1000,1241],'hero-kronik.jpg':[1800,1005],'humaniora-hands.jpg':[1400,939],'jejak-archive.jpg':[1400,939],'khazanah-temple.jpg':[1600,1073],'poet-portrait.jpg':[900,1117],'seni-brush.jpg':[1400,939]};
+const imgW = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[0];
+const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1];
 ---
 <section class="en">
   <div class="wrap en__inner">
     <div class="en__portrait" aria-hidden="true">
       <div class="en__frame">
-        <img src="/img/poet-portrait.jpg" alt="" loading="lazy" />
+        <img src="/img/poet-portrait.jpg" alt="" loading="lazy" /
+            width={imgW('/img/poet-portrait.jpg')}
+            height={imgH('/img/poet-portrait.jpg')}
+          />
       </div>
       <span class="en__caption">Saraswati Dewi<br /><em>Pemimpin Redaksi</em></span>
     </div>

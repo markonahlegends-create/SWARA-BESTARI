@@ -14,9 +14,13 @@ const posts = byRubrik(r.slug);
 const [lead, ...rest] = posts;
 const others = latest.filter((a) => a.rubrik !== r.slug).slice(0, 5);
 const sibling = rubrik.filter((x) => x.slug !== r.slug);
+// Dimensi intrinsik gambar: mencegah layout shift saat gambar dimuat.
+const IMG_SIZES: Record<string, [number, number]> = {'art-gallery.jpg':[1400,939],'cover-current.jpg':[900,1117],'diskursus-forum.jpg':[1400,939],'esai-library.jpg':[1000,1241],'hero-kronik.jpg':[1800,1005],'humaniora-hands.jpg':[1400,939],'jejak-archive.jpg':[1400,939],'khazanah-temple.jpg':[1600,1073],'poet-portrait.jpg':[900,1117],'seni-brush.jpg':[1400,939]};
+const imgW = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[0];
+const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1];
 ---
 
-<Base title={`${r.name}`} description={r.description}>
+<Base title={`${r.name}`} description={r.description} image={`/og/rubrik-${r.slug}.jpg`}>
   <!-- ═════════ HEADER RUBRIK ═════════ -->
   <header class="rh">
     <div class="wrap">
@@ -46,7 +50,10 @@ const sibling = rubrik.filter((x) => x.slug !== r.slug);
         <>
           <a href={`/tulisan/${lead.slug}`} class="rlead">
             <div class="rlead__img">
-              <img src={lead.image} alt={lead.imageAlt} />
+              <img src={lead.image} alt={lead.imageAlt} /
+            width={imgW(lead.image)}
+            height={imgH(lead.image)}
+          />
               <span class="rlead__badge">Edisi Terbaru</span>
             </div>
             <div class="rlead__body">
@@ -67,7 +74,10 @@ const sibling = rubrik.filter((x) => x.slug !== r.slug);
             {rest.map((a) => (
               <a href={`/tulisan/${a.slug}`} class="ritem">
                 <div class="ritem__img">
-                  <img src={a.image} alt={a.imageAlt} loading="lazy" />
+                  <img src={a.image} alt={a.imageAlt} loading="lazy" /
+            width={imgW(a.image)}
+            height={imgH(a.image)}
+          />
                 </div>
                 <div class="ritem__body">
                   <span class="ritem__meta">{formatDate(a.date)} · {a.reading} mnt baca</span>

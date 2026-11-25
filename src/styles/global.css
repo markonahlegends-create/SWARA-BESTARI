@@ -105,6 +105,16 @@
   --maxw: 1440px;
   --readw: 68ch;
 
+  /* ── TINGGI MASTHEAD ────────────────────────────────────────
+     Header diposisikan fixed, jadi tinggi ini harus dipesan di body
+     lewat padding-top. Semua nilai dipatok — tidak ada yang berubah
+     saat header beralih ke mode ringkas, sehingga isi halaman tidak
+     pernah meloncat saat gulir. */
+  --mh-top: 34px;
+  --mh-main: 128px;
+  --mh-nav: 46px;
+  --mh-total: calc(var(--mh-top) + var(--mh-main) + var(--mh-nav));
+
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -124,15 +134,23 @@
 }
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-behavior: smooth;
-  scroll-padding-top: 7rem;
+  /* Sengaja tanpa scroll-behavior: smooth.
+     Smooth-scroll di level dokumen beradu dengan penguncian gulir
+     saat header menyusut, dan menghasilkan lompatan halus yang terlihat
+     seperti kedipan. Lompatan anchor ditangani JS dengan scrollIntoView. */
+  scroll-padding-top: calc(var(--mh-total) + 1.25rem);
+  /* Cegah browser "menambal" posisi gulir sendiri saat tinggi layout
+     berubah — sumber getaran halus di beberapa peramban. */
+  overflow-anchor: none;
 }
 [id] {
-  scroll-margin-top: 7rem;
+  scroll-margin-top: calc(var(--mh-total) + 1.25rem);
 }
 body {
   background: var(--paper);
   color: var(--ink);
+  /* Ruang untuk masthead yang fixed. */
+  padding-top: var(--mh-total);
   font-family: var(--serif-body);
   font-size: 1.0625rem;
   line-height: 1.7;
@@ -177,7 +195,11 @@ p {
   color: var(--ink);
 }
 
-/* ── KERTAS BERBUTIR ───────────────────────────────────────── */
+/* ── KERTAS BERBUTIR ─────────────────────────────────────────
+   Tekstur sekarang berupa tile PNG 180×180, bukan filter SVG.
+   Filter feTurbulence lama dievaluasi ulang oleh GPU pada setiap
+   frame gulir — itulah yang membuat layar terasa "berkedip".
+   Satu tile raster jauh lebih murah: dilukis sekali, lalu disalin. */
 .grain::after {
   content: '';
   position: fixed;
@@ -185,7 +207,11 @@ p {
   pointer-events: none;
   z-index: 9998;
   opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url('/img/grain.png');
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  /* Jangan buat layer komposit sendiri: biarkan tetap di akar. */
+  contain: strict;
 }
 
 /* ── UTILITAS TIPOGRAFI ────────────────────────────────────── */
@@ -371,15 +397,20 @@ a:hover > .ln::after {
   outline-offset: 3px;
 }
 
-/* ── ANIMASI MASUK ─────────────────────────────────────────── */
-[data-reveal] {
+/* ── ANIMASI MASUK ───────────────────────────────────────────
+   Status tersembunyi hanya aktif bila JS benar-benar berjalan
+   (kelas .js-reveal dipasang di <head>). Tanpa JS, konten
+   langsung terlihat — tidak ada halaman kosong yang lalu "klap klip".
+   `will-change` sengaja dihapus: 28 elemen ber-will-change memaksa
+   peramban membuat 28 layer komposit GPU sekaligus, dan itu membuat
+   gulir tersendat. Transform biasa sudah di-promote saat animasi. */
+.js-reveal [data-reveal] {
   opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+  transform: translateY(18px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
   transition-delay: var(--d, 0s);
-  will-change: opacity, transform;
 }
-[data-reveal].is-in {
+.js-reveal [data-reveal].is-in {
   opacity: 1;
   transform: none;
 }
@@ -387,7 +418,7 @@ a:hover > .ln::after {
   html {
     scroll-behavior: auto;
   }
-  [data-reveal] {
+  .js-reveal [data-reveal] {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
@@ -420,4 +451,19 @@ a:hover > .ln::after {
   height: 5px;
   transform: rotate(45deg);
   background: currentColor;
+}
+
+
+/* ── TINGGI MASTHEAD PER BREAKPOINT ──────────────────────────
+   Tanpa nav rubrik di layar sempit, jadi baris nav tidak dipesan. */
+@media (max-width: 900px) {
+  :root {
+    --mh-main: 100px;
+    --mh-nav: 0px;
+  }
+}
+@media (max-width: 560px) {
+  :root {
+    --mh-main: 88px;
+  }
 }
