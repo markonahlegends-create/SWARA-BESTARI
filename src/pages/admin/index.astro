@@ -430,6 +430,14 @@ const SITE = 'Swara Bestari';
       .adm *::after { box-sizing: border-box; }
       .adm button { font: inherit; cursor: pointer; }
 
+      /* ══ Aturan keselamatan ══
+         Atribut `hidden` di HTML kalah dari `display` di CSS. Tanpa baris
+         ini, `.gate` dan `.app` yang punya `display: grid` akan tetap
+         tampil meski sudah diberi `hidden` — akibatnya panel login
+         menutupi dashboard selamanya dan tombol Masuk terasa mati. */
+      .gate[hidden],
+      .app[hidden] { display: none; }
+
       /* ══ Gerbang masuk ══ */
       .gate {
         min-height: 100vh;
@@ -1032,16 +1040,28 @@ const SITE = 'Swara Bestari';
         e.preventDefault();
         const btn = $('#login-btn');
         const err = $('#login-err');
+        const pass = $('#login-pass');
+
+        // Umpan balik seketika: tombol tidak boleh terasa "diam".
         btn.disabled = true;
+        btn.textContent = 'Memeriksa…';
         err.hidden = true;
+
         try {
-          await api('login', { password: $('#login-pass').value });
+          await api('login', { password: pass.value });
+          btn.textContent = 'Berhasil — membuka…';
+          pass.value = '';
           await start();
         } catch (ex) {
-          err.textContent = ex.message || 'Gagal masuk.';
+          const msg = String(ex.message || '');
+          // Jaringan putus / fungsi tidak terjangkau: jelaskan, jangan diam.
+          err.textContent = /fetch|network|Failed/i.test(msg)
+            ? 'Tidak bisa menghubungi server. Periksa koneksi internet Anda, lalu coba lagi.'
+            : msg || 'Gagal masuk. Coba lagi.';
           err.hidden = false;
-        } finally {
           btn.disabled = false;
+          btn.textContent = 'Masuk';
+          pass.select();
         }
       });
 

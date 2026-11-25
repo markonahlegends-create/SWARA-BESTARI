@@ -195,6 +195,15 @@ p {
   color: var(--ink);
 }
 
+/* ── ATRIBUT HIDDEN ────────────────────────────────────────────
+   Lembar gaya ini memasang `display` pada banyak kelas (grid, flex).
+   Aturan kelas selalu mengalahkan atribut `hidden` bawaan peramban,
+   sehingga elemen bisa "tidak bisa disembunyikan" tanpa disadari.
+   Satu aturan ini menutup seluruh kemungkinan itu di semua halaman. */
+[hidden] {
+  display: none !important;
+}
+
 /* ── KERTAS BERBUTIR ─────────────────────────────────────────
    Tekstur sekarang berupa tile PNG 180×180, bukan filter SVG.
    Filter feTurbulence lama dievaluasi ulang oleh GPU pada setiap
