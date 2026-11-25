@@ -29,9 +29,13 @@ const humaniora = byRubrik('humaniora');
 const seni = byRubrik('seni');
 const diskursus = byRubrik('diskursus');
 const ticker = latest.slice(0, 6);
+// Dimensi intrinsik gambar: mencegah layout shift saat gambar dimuat.
+const IMG_SIZES: Record<string, [number, number]> = {'art-gallery.jpg':[1400,939],'cover-current.jpg':[900,1117],'diskursus-forum.jpg':[1400,939],'esai-library.jpg':[1000,1241],'hero-kronik.jpg':[1800,1005],'humaniora-hands.jpg':[1400,939],'jejak-archive.jpg':[1400,939],'khazanah-temple.jpg':[1600,1073],'poet-portrait.jpg':[900,1117],'seni-brush.jpg':[1400,939]};
+const imgW = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[0];
+const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1];
 ---
 
-<Base title={site.name} description={site.description}>
+<Base title={site.name} description={site.description} image="/og/beranda.jpg">
   <!-- ═════════ META STRIP ═════════ -->
   <div class="meta-strip">
     <div class="wrap meta-strip__inner">
@@ -48,7 +52,10 @@ const ticker = latest.slice(0, 6);
       <!-- feature besar -->
       <article class="hero__lead" data-reveal>
         <a href={`/tulisan/${hero.slug}`} class="hero__imgwrap">
-          <img src={hero.image} alt={hero.imageAlt} fetchpriority="high" />
+          <img src={hero.image} alt={hero.imageAlt} fetchpriority="high" /
+            width={imgW(hero.image)}
+            height={imgH(hero.image)}
+          />
           <span class="hero__badge">Laporan Utama</span>
           <span class="hero__imgcaption">{hero.imageCredit}</span>
         </a>
@@ -78,7 +85,10 @@ const ticker = latest.slice(0, 6);
         {side.map((a, i) => (
           <article class="hero__sideitem" data-reveal style={`--d:${0.08 * (i + 1)}s`}>
             <a href={`/tulisan/${a.slug}`} class="hero__sideimg">
-              <img src={a.image} alt={a.imageAlt} loading="lazy" />
+              <img src={a.image} alt={a.imageAlt} loading="lazy" /
+            width={imgW(a.image)}
+            height={imgH(a.image)}
+          />
             </a>
             <div class="hero__sidebody">
               <span class="hero__siderubrik">{a.rubrik === 'esai' ? 'Esai' : a.rubrik === 'khazanah' ? 'Khazanah' : 'Humaniora'}</span>
@@ -130,7 +140,10 @@ const ticker = latest.slice(0, 6);
         <!-- esai besar -->
         <article class="curation__essay" data-reveal>
           <a href={`/tulisan/${essay.slug}`} class="curation__img">
-            <img src={essay.image} alt={essay.imageAlt} loading="lazy" />
+            <img src={essay.image} alt={essay.imageAlt} loading="lazy" /
+            width={imgW(essay.image)}
+            height={imgH(essay.image)}
+          />
           </a>
           <span class="eyebrow">Esai · {formatDate(essay.date)}</span>
           <h3 class="curation__title">
@@ -187,7 +200,10 @@ const ticker = latest.slice(0, 6);
       <div class="artgrid">
         <article class="artgrid__lead" data-reveal>
           <a href={`/tulisan/${poetryFeature.slug}`} class="artgrid__img">
-            <img src={poetryFeature.image} alt={poetryFeature.imageAlt} loading="lazy" />
+            <img src={poetryFeature.image} alt={poetryFeature.imageAlt} loading="lazy" /
+            width={imgW(poetryFeature.image)}
+            height={imgH(poetryFeature.image)}
+          />
           </a>
           <div class="artgrid__body">
             <h3 class="artgrid__title">
@@ -201,7 +217,10 @@ const ticker = latest.slice(0, 6);
           {seni.slice(1).concat(diskursus.slice(0, 1)).map((a, i) => (
             <a href={`/tulisan/${a.slug}`} class="artgrid__item" data-reveal style={`--d:${0.07 * i}s`}>
               <div class="artgrid__thumb">
-                <img src={a.image} alt={a.imageAlt} loading="lazy" />
+                <img src={a.image} alt={a.imageAlt} loading="lazy" /
+            width={imgW(a.image)}
+            height={imgH(a.image)}
+          />
               </div>
               <div>
                 <span class="artgrid__kicker">{a.rubrik === 'seni' ? 'Seni' : 'Diskursus'}</span>
@@ -231,7 +250,10 @@ const ticker = latest.slice(0, 6);
         />
         <div class="hub__lead" data-reveal>
           <a href={`/tulisan/${humaniora[0].slug}`} class="hub__leadimg">
-            <img src={humaniora[0].image} alt={humaniora[0].imageAlt} loading="lazy" />
+            <img src={humaniora[0].image} alt={humaniora[0].imageAlt} loading="lazy" /
+            width={imgW(humaniora[0].image)}
+            height={imgH(humaniora[0].image)}
+          />
           </a>
           <div class="hub__leadbody">
             <h3><a href={`/tulisan/${humaniora[0].slug}`}>{humaniora[0].title}</a></h3>

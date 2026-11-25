@@ -12,12 +12,19 @@ interface Props {
 const { article, variant = 'standard', index, tone = 'light' } = Astro.props;
 const r = rubrikBySlug[article.rubrik];
 const href = `/tulisan/${article.slug}`;
+// Dimensi intrinsik gambar: mencegah layout shift saat gambar dimuat.
+const IMG_SIZES: Record<string, [number, number]> = {'art-gallery.jpg':[1400,939],'cover-current.jpg':[900,1117],'diskursus-forum.jpg':[1400,939],'esai-library.jpg':[1000,1241],'hero-kronik.jpg':[1800,1005],'humaniora-hands.jpg':[1400,939],'jejak-archive.jpg':[1400,939],'khazanah-temple.jpg':[1600,1073],'poet-portrait.jpg':[900,1117],'seni-brush.jpg':[1400,939]};
+const imgW = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[0];
+const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1];
 ---
 
 <a href={href} class:list={['card', `card--${variant}`, `card--${tone}`]} aria-label={article.title}>
   {variant !== 'minimal' && variant !== 'number' && (
     <div class="card__media">
-      <img src={article.image} alt={article.imageAlt} loading="lazy" decoding="async" />
+      <img src={article.image} alt={article.imageAlt} loading="lazy" decoding="async" /
+            width={imgW(article.image)}
+            height={imgH(article.image)}
+          />
       <span class="card__rubrik">{r.name}</span>
     </div>
   )}

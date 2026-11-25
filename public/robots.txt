@@ -1,0 +1,7 @@
+# Swara Bestari — majalah digital seni & kebudayaan
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://swara-bestari.vercel.app/sitemap-index.xml

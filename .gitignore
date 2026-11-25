@@ -26,3 +26,6 @@ Thumbs.db
 # raw art sources (kept locally, not shipped)
 assets-src/*.png
 !assets-src/logo-original.png
+
+# vercel build output
+.vercel/

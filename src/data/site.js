@@ -2,92 +2,12 @@
 //  SWARA BESTARI — Data Redaksi & Rubrik
 // ─────────────────────────────────────────────────────────────
 
-export const site = {
-  name: 'Swara Bestari',
-  tagline: 'Suara yang Menjaga Ingatan',
-  description:
-    'Majalah digital seni, kebudayaan, dan pemikiran. Membaca yang tersisa, merawat yang belum selesai.',
-  phone: '+62 819-4993-5400',
-  phoneHref: '+6281949935400',
-  whatsapp: 'https://wa.me/6281949935400',
-  email: 'redaksi@swarabestari.id',
-  address: 'Yogyakarta — Bandung, Indonesia',
-  established: 2019,
-  issn: '2774-XXXX',
-};
+import settingsData from './content/settings.json' with { type: 'json' };
 
-export const nav = [
-  { label: 'Beranda', href: '/' },
-  { label: 'Kronik', href: '/rubrik/kronik' },
-  { label: 'Esai', href: '/rubrik/esai' },
-  { label: 'Diskursus', href: '/rubrik/diskursus' },
-  { label: 'Khazanah', href: '/rubrik/khazanah' },
-  { label: 'Seni', href: '/rubrik/seni' },
-  { label: 'Humaniora', href: '/rubrik/humaniora' },
-];
-
-export const secondaryNav = [
-  { label: 'Arsip', href: '/arsip' },
-  { label: 'Ruang Baca', href: '/ruang-baca' },
-  { label: 'Podcast', href: '/podcast' },
-  { label: 'Tentang', href: '/tentang' },
-];
-
-export const rubrik = [
-  {
-    slug: 'kronik',
-    name: 'Kronik',
-    index: '01',
-    tagline: 'Peristiwa yang menolak dilupakan.',
-    description:
-      'Catatan dari tepi sejarah: peristiwa kecil yang membentuk wajah zaman, kisah orang biasa yang luput dari arsip negara, dan lintasan waktu yang berdegup di gang-gang sempit.',
-    accent: '#B08736',
-  },
-  {
-    slug: 'esai',
-    name: 'Esai',
-    index: '02',
-    tagline: 'Pikiran yang berjalan pelan.',
-    description:
-      'Gagasan yang diuji dengan kesabaran. Renungan tentang bahasa, keindahan, kesepian, dan hal-hal yang tak pernah selesai kita pikirkan.',
-    accent: '#8E6B33',
-  },
-  {
-    slug: 'diskursus',
-    name: 'Diskursus',
-    index: '03',
-    tagline: 'Ruang untuk berselisih dengan hormat.',
-    description:
-      'Polemik, wawancara, dan perdebatan terbuka mengenai kebijakan budaya, etika teknologi, serta masa depan pendidikan humaniora di Indonesia.',
-    accent: '#6E5A3A',
-  },
-  {
-    slug: 'khazanah',
-    name: 'Khazanah',
-    index: '04',
-    tagline: 'Warisan yang masih berbicara.',
-    description:
-      'Naskah kuno, candi, tenun, kuliner pusaka, dan pengetahuan lokal yang tersimpan rapi dalam tubuh masyarakat. Kami membacanya ulang tanpa romantisme berlebih.',
-    accent: '#8C7A4B',
-  },
-  {
-    slug: 'seni',
-    name: 'Seni',
-    index: '05',
-    tagline: 'Mata yang dilatih melihat.',
-    description:
-      'Seni rupa, pertunjukan, film, dan arsitektur. Ulasan pameran, profil seniman, serta percakapan tentang proses di balik karya yang selesai.',
-    accent: '#A88B4E',
-  },
-  {
-    slug: 'humaniora',
-    name: 'Humaniora',
-    index: '06',
-    tagline: 'Manusia, dan segala ketidakrapiannya.',
-    description:
-      'Antropologi, sosiologi, psikologi, dan filsafat terapan. Cara-cara baru memahami tubuh, ingatan, keluarga, dan kebersamaan di abad yang gelisah.',
-    accent: '#7B6A52',
-  },
-];
+// Sumber data: src/data/content/settings.json (dikelola lewat /admin).
+export const site = settingsData.site;
+export const nav = settingsData.nav;
+export const secondaryNav = settingsData.secondaryNav;
+export const rubrik = settingsData.rubrik;
 
 export const rubrikBySlug = Object.fromEntries(rubrik.map((r) => [r.slug, r]));
