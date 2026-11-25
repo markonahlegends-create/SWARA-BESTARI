@@ -345,10 +345,18 @@ const SITE = 'Swara Bestari';
             </label>
           </div>
 
-          <label class="fld">
-            <span class="fld__label">Gambar</span>
-            <select class="inp" id="f-image"></select>
-          </label>
+          <div class="fld">
+            <span class="fld__label">Gambar utama</span>
+            <div class="imgrow">
+              <select class="inp" id="f-image"></select>
+              <button type="button" class="btn btn--ghost" id="upload-btn">Unggah…</button>
+            </div>
+            <input type="file" id="upload-input" accept="image/*" hidden />
+            <p class="fld__hint" id="upload-note">
+              Unggah foto dari komputer atau ponsel — otomatis dikompres ke maksimal 1600 px.
+            </p>
+            <img id="img-preview" class="imgprev" alt="" />
+          </div>
 
           <label class="fld">
             <span class="fld__label">Teks alternatif gambar</span>
@@ -799,6 +807,18 @@ const SITE = 'Swara Bestari';
       .inp--search { width: 200px; }
       .inp--cell { padding: 0.32rem 0.45rem; font-size: 0.82rem; min-width: 90px; }
       .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.9rem; }
+      .imgrow { display: flex; gap: 0.5rem; }
+      .imgrow .inp { flex: 1; }
+      .imgprev {
+        display: none;
+        margin-top: 0.6rem;
+        width: 100%;
+        max-height: 190px;
+        object-fit: cover;
+        border: 1px solid var(--line);
+        border-radius: 2px;
+      }
+      .imgprev.is-on { display: block; }
 
       /* ══ Laci editor ══ */
       .drawer { position: fixed; inset: 0; z-index: 900; }
@@ -1248,6 +1268,9 @@ const SITE = 'Swara Bestari';
           $('#f-image').value = a.image;
         }
 
+        previewImage(f.image);
+        $('#upload-note').textContent =
+          'Unggah foto dari komputer atau ponsel — otomatis dikompres ke maksimal 1600 px.';
         $('#drawer').hidden = false;
         document.body.style.overflow = 'hidden';
         setTimeout(() => $('#f-title').focus(), 90);
@@ -1328,6 +1351,68 @@ const SITE = 'Swara Bestari';
         } finally {
           btn.disabled = false;
           btn.textContent = 'Simpan & terbitkan';
+        }
+      });
+
+      /* ══ Unggah gambar ══ */
+      function previewImage(src) {
+        const el = $('#img-preview');
+        if (!src) return el.classList.remove('is-on');
+        el.src = src;
+        el.alt = 'Pratinjau gambar utama';
+        el.classList.add('is-on');
+      }
+
+      $('#f-image').addEventListener('change', (e) => previewImage(e.target.value));
+
+      $('#upload-btn').addEventListener('click', () => $('#upload-input').click());
+
+      $('#upload-input').addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const note = $('#upload-note');
+        const btn = $('#upload-btn');
+
+        btn.disabled = true;
+        note.textContent = 'Mengompres & mengunggah…';
+
+        try {
+          // Baca berkas jadi data URL di sisi klien.
+          const dataUrl = await new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(r.result);
+            r.onerror = reject;
+            r.readAsDataURL(file);
+          });
+
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: file.name, dataUrl }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Unggah gagal.');
+
+          // Sisipkan sebagai opsi terpilih.
+          const opt = document.createElement('option');
+          opt.value = data.path;
+          opt.textContent = `${data.path.split('/').pop()} · ${data.width}×${data.height}`;
+          $('#f-image').appendChild(opt);
+          $('#f-image').value = data.path;
+          previewImage(data.path);
+
+          const saved = data.originalBytes && data.originalBytes > data.bytes
+            ? ` (dari ${Math.round(data.originalBytes / 1024)} KB → ${Math.round(data.bytes / 1024)} KB)`
+            : '';
+          note.textContent = `Terunggah${saved}. Gambar masuk ke repo dan tayang setelah situs dibangun ulang.`;
+          toast('Gambar terunggah.');
+        } catch (ex) {
+          note.textContent = 'Gagal mengunggah. Coba berkas lain.';
+          toast(ex.message, true);
+        } finally {
+          btn.disabled = false;
+          e.target.value = '';
         }
       });
 

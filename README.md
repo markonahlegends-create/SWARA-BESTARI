@@ -42,6 +42,8 @@ Paragraf biasa cukup diketik apa adanya.
 Paragraf berikutnya, pisahkan dengan satu baris kosong.
 ```
 
+**Unggah gambar** — di editor artikel, tombol *Unggah…* menerima foto dari komputer atau ponsel. Gambar otomatis diputar sesuai orientasi EXIF, diperkecil ke maksimal 1600 px, dan dikompres jadi JPEG (foto 8 MB biasanya menjadi ±120 KB). Tersimpan ke `public/img/` lewat GitHub.
+
 **Ruang Iklan** — ubah tarif per slot, catatan penempatan, harga paket kemitraan, dan angka audiens yang tampil di halaman `/iklan`.
 
 **Statistik** — grafik pembaca harian 30 hari, sumber kunjungan, perangkat, dan artikel terpopuler.
@@ -66,7 +68,27 @@ Dashboard perlu tiga variabel lingkungan di Vercel: **Project → Settings → E
 | `VERCEL_TEAM_ID` | `team_QNzRaD0U71Gj5fQGxgvOFTHD` | opsional |
 | `PUBLIC_SITE_URL` | Domain sendiri, mis. `https://swarabestari.id` | opsional |
 
-Membuat `GITHUB_TOKEN`: GitHub → **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**. Pilih hanya repositori ini, izin **Contents: Read and write**. Tanpa token yang sama sekali berbeda dari token akun biasa.
+#### Cara mengisi `GITHUB_TOKEN` (paling mudah)
+
+Klik tautan ini — semua isian formulir GitHub sudah terisi otomatis:
+
+**https://github.com/settings/personal-access-tokens/new?name=swara-bestari-dashboard&description=Dashboard+admin+Swara+Bestari+-+baca+%26+tulis+konten+di+src%2Fdata%2Fcontent&contents=write&metadata=read**
+
+Lalu hanya perlu tiga klik:
+
+1. **Resource owner** → pilih akun Anda (`markonahlegends-create`).
+2. **Repository access** → **Only select repositories** → pilih `SWARA-BESTARI`.
+3. Gulir ke bawah → **Generate token** → salin token yang muncul (diawali `github_pat_`).
+
+Tempel token itu ke nilai `GITHUB_TOKEN` di Vercel.
+
+> Token hanya ditampilkan **sekali**. Kalau tertutup, buat token baru — tidak masalah, yang lama bisa dihapus.
+
+**Kalau ingin mengisi manual:** GitHub → foto profil → **Settings** → **Developer settings** → **Personal access tokens** → **Fine-grained tokens** → **Generate new token**. Isi *Token name* bebas, *Expiration* 1 tahun, *Repository access* → **Only select repositories** → `SWARA-BESTARI`, lalu pada *Permissions* → **Repository permissions** → **Contents** = **Read and write**. Simpan.
+
+> **Jangan** pakai *Tokens (classic)* — izinnya terlalu luas (seluruh akun Anda), sedangkan fine-grained hanya menyentuh satu repositori ini.
+
+`GITHUB_TOKEN` berbeda sama sekali dari kata sandi GitHub dan dari token yang dipakai Antigravity. Ini kunci khusus yang hanya boleh menulis berkas di repo ini.
 
 Setelah variabel diisi, **deploy ulang** (Deployments → ⋯ → Redeploy). Dashboard langsung bisa dipakai.
 
@@ -115,7 +137,8 @@ src/
     rubrik/[slug].astro
     arsip, iklan, tentang, podcast, ruang-baca, 404
     admin/index.astro   ← dashboard
-    api/admin.ts        ← satu-satunya endpoint dinamis
+    api/admin.ts        ← API konten & statistik
+    api/upload.ts       ← unggah gambar (kompres via sharp)
   styles/global.css     token desain, palet gading–emas–arang
 public/
   img/                  10 foto artikel + grain.png
