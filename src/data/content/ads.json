@@ -4,7 +4,7 @@
       "id": "billboard",
       "format": "billboard",
       "size": "970 × 250",
-      "rate": "Rp 12.500.000 / bulan",
+      "rate": "Rp 1.000.000 / bulan",
       "note": "Slot premium, di atas lipatan. Impresi tertinggi di seluruh situs.",
       "slot": "sb-billboard-top"
     },
@@ -12,7 +12,7 @@
       "id": "leaderboard",
       "format": "leaderboard",
       "size": "728 × 90",
-      "rate": "Rp 6.500.000 / bulan",
+      "rate": "Rp 700.000 / bulan",
       "note": "Letak selebar kolom isi, di antara dua blok artikel.",
       "slot": "sb-leaderboard-mid"
     },
@@ -20,7 +20,7 @@
       "id": "halfpage",
       "format": "halfpage",
       "size": "300 × 600",
-      "rate": "Rp 8.000.000 / bulan",
+      "rate": "Rp 500.000 / bulan",
       "note": "Sticky sidebar desktop. CTR tertinggi setelah billboard.",
       "slot": "sb-halfpage-rail"
     },
@@ -28,7 +28,7 @@
       "id": "square",
       "format": "square",
       "size": "300 × 250",
-      "rate": "Rp 4.000.000 / bulan",
+      "rate": "Rp 400.000 / bulan",
       "note": "Modular, tersedia di sidebar dan dalam artikel.",
       "slot": "sb-square-1"
     },
@@ -36,7 +36,7 @@
       "id": "strip",
       "format": "strip",
       "size": "970 × 90",
-      "rate": "Rp 5.000.000 / bulan",
+      "rate": "Rp 300.000 / bulan",
       "note": "Bilah horizontal sebelum footer, kontinuitas dengan billboard.",
       "slot": "sb-strip-footer"
     },
@@ -44,7 +44,7 @@
       "id": "skyscraper",
       "format": "skyscraper",
       "size": "160 × 600",
-      "rate": "Rp 5.500.000 / bulan",
+      "rate": "Rp 300.000 / bulan",
       "note": "Menara sempit di sisi kanan halaman artikel.",
       "slot": "sb-skyscraper-article"
     },
@@ -52,7 +52,7 @@
       "id": "native",
       "format": "native",
       "size": "Native / 100% width",
-      "rate": "Rp 9.000.000 / mata surat",
+      "rate": "Rp 2.500.000 / mata surat",
       "note": "Ditulis oleh tim redaksi, disetujui mitra. Berlabel “Mata Surat”.",
       "slot": "sb-native-feed"
     },
@@ -60,7 +60,7 @@
       "id": "compact",
       "format": "compact",
       "size": "320 × 220",
-      "rate": "Rp 3.500.000 / bulan",
+      "rate": "Rp1.000.000 / bulan",
       "note": "Kartu di dalam grid kanal, menyatu dengan tata letak editorial.",
       "slot": "sb-compact-grid"
     }
@@ -69,7 +69,7 @@
     {
       "name": "Lentera",
       "tier": "Jalur Awal",
-      "price": "Rp 4,5 juta",
+      "price": "Rp 2,5 juta",
       "period": "/ bulan",
       "desc": "Untuk merek yang ingin mulai hadir di lingkungan pembaca humaniora.",
       "items": [
@@ -77,12 +77,13 @@
         "1× kartu compact di grid kanal",
         "Laporan impresi bulanan",
         "Optimasi penempatan oleh tim kami"
-      ]
+      ],
+      "summary": ""
     },
     {
       "name": "Candra",
       "tier": "Paling Diminati",
-      "price": "Rp 15 juta",
+      "price": "Rp 4 juta",
       "period": "/ bulan",
       "desc": "Paket seimbang untuk kampanye citra merek berdurasi satu bulan.",
       "items": [
@@ -92,12 +93,13 @@
         "Newsletter takeover (1 edisi)",
         "Laporan mingguan + analisis audiens"
       ],
-      "featured": true
+      "featured": true,
+      "summary": ""
     },
     {
       "name": "Bestari",
       "tier": "Kemitraan",
-      "price": "Rp 45 juta",
+      "price": "Rp 7 juta",
       "period": "/ kuartal",
       "desc": "Kemitraan editorial penuh: hadir dalam percakapan, bukan sekadar menyela.",
       "items": [
@@ -107,7 +109,8 @@
         "4× takeover newsletter",
         "Sponsor rubrik eksklusif",
         "Laporan audiens mendalam (dashboard)"
-      ]
+      ],
+      "summary": ""
     }
   ],
   "audience": [
