@@ -71,7 +71,7 @@
       "tier": "Jalur Awal",
       "price": "Rp 2,5 juta",
       "period": "/ bulan",
-      "desc": "Untuk merek yang ingin mulai hadir di lingkungan pembaca humaniora.",
+      "desc": "Deskripsi paket Lentera hasil uji dashboard.",
       "items": [
         "2× slot square 300×250",
         "1× kartu compact di grid kanal",
@@ -139,7 +139,8 @@
     {
       "name": "Billboard",
       "size": "970 × 250",
-      "placement": "Bawah masthead beranda"
+      "placement": "Bawah masthead beranda",
+      "rate": "Rp 1.050.000 / bulan"
     },
     {
       "name": "Leaderboard",
