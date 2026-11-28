@@ -125,12 +125,14 @@ const proposalPdf = (nama) => `/unduhan/proposal-${nama.toLowerCase()}.pdf`;
         <div class="fm__tr fm__tr--head">
           <span>Format</span>
           <span>Ukuran</span>
+          <span>Tarif / Bulan</span>
           <span>Penempatan</span>
         </div>
         {adFormats.map((f) => (
           <div class="fm__tr">
             <span class="fm__name">{f.name}</span>
             <span class="fm__size">{f.size}</span>
+            <span class="fm__rate">{f.rate || '—'}</span>
             <span class="fm__place">{f.placement}</span>
           </div>
         ))}
@@ -505,13 +507,19 @@ const proposalPdf = (nama) => `/unduhan/proposal-${nama.toLowerCase()}.pdf`;
   .fm__table { border-top: 1px solid var(--ink); }
   .fm__tr {
     display: grid;
-    grid-template-columns: 1fr 1fr 1.6fr;
+    grid-template-columns: 1fr 0.8fr 1.1fr 1.4fr;
     gap: 1.5rem;
     padding-block: 0.95rem;
     border-bottom: 1px solid var(--line);
     font-size: 0.9rem;
     align-items: baseline;
   }
+  .fm__rate {
+    font-family: var(--serif-display);
+    font-size: 0.95em;
+    color: var(--gold-700);
+  }
+
   .fm__tr--head {
     font-family: var(--sans);
     font-size: 0.55rem;
@@ -660,7 +668,7 @@ const proposalPdf = (nama) => `/unduhan/proposal-${nama.toLowerCase()}.pdf`;
     .pk__grid, .demo__three, .pr__inner, .ctakt__inner { grid-template-columns: 1fr; }
     .demo__split { grid-template-columns: 1fr; }
     .demo__col--rail { justify-self: start; }
-    .fm__tr { grid-template-columns: 1fr 1fr; }
+    .fm__tr { grid-template-columns: 1fr 0.9fr 1.1fr; }
     .fm__place { display: none; }
   }
   @media (max-width: 560px) {

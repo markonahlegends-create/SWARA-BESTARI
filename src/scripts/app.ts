@@ -1,12 +1,36 @@
 /* ═══════════════════════════════════════════════════════════
    SWARA BESTARI — Interaksi
-   ═══════════════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════
 
-const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+   ATURAN PENTING: setiap blok dibungkus `aman()` supaya kegagalan
+   satu fitur tidak mematikan seluruh skrip.
+
+   Bug yang pernah terjadi: `new IntersectionObserver(...)` dipanggil
+   tanpa penjaga. Di peramban yang tidak mendukungnya (WebKit lama,
+   sebagian peramban dalam aplikasi), skrip berhenti di baris itu —
+   dan karena semua fitur ada di satu berkas, MENU MOBILE, pencarian,
+   serta garis kemajuan ikut mati total. Gejalanya: "menu tidak bisa
+   diklik" padahal tombolnya ada.
+   ─────────────────────────────────────────────────────────── */
+
+/** Menjalankan satu blok fitur; kegagalannya tidak menjalar ke blok lain. */
+function aman(nama: string, fn: () => void) {
+  try {
+    fn();
+  } catch (e) {
+    // Catat sewajarnya; jangan sampai menghentikan skrip.
+    console.warn(`[swara] fitur "${nama}" terlewat:`, e);
+  }
+}
+
+const prefersReduced =
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ── 1. GARIS KEMAJUAN GULIR ──────────────────────────────── */
-const bar = document.getElementById('progress-bar');
-if (bar) {
+aman('kemajuan-gulir', () => {
+  const bar = document.getElementById('progress-bar');
+  if (!bar) return;
   let raf = 0;
   const update = () => {
     const h = document.documentElement;
@@ -23,32 +47,40 @@ if (bar) {
     { passive: true }
   );
   update();
-}
+});
 
 /* ── 2. REVEAL SAAT MASUK LAYAR ───────────────────────────── */
-const revealEls = document.querySelectorAll('[data-reveal]');
-if (revealEls.length) {
-  if (prefersReduced) {
+aman('reveal', () => {
+  const revealEls = document.querySelectorAll('[data-reveal]');
+  if (!revealEls.length) return;
+
+  // Tanpa IntersectionObserver, tampilkan semua sekaligus. Elemen yang
+  // dibiarkan transparan akan terlihat seperti halaman kosong — jauh
+  // lebih buruk daripada kehilangan animasinya.
+  if (prefersReduced || typeof IntersectionObserver === 'undefined') {
     revealEls.forEach((el) => el.classList.add('is-in'));
-  } else {
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add('is-in');
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
-    );
-    revealEls.forEach((el) => io.observe(el));
+    return;
   }
-}
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-in');
+          io.unobserve(e.target);
+        }
+      });
+    },
+    { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+  );
+  revealEls.forEach((el) => io.observe(el));
+});
 
 /* ── 3. PARALAKS LEMBUT ───────────────────────────────────── */
-const parallaxEls = document.querySelectorAll<HTMLElement>('[data-parallax]');
-if (parallaxEls.length && !prefersReduced) {
+aman('paralaks', () => {
+  const parallaxEls = document.querySelectorAll<HTMLElement>('[data-parallax]');
+  if (!parallaxEls.length || prefersReduced) return;
+
   let ticking = false;
   const last = new Map<HTMLElement, number>();
   const run = () => {
@@ -78,186 +110,203 @@ if (parallaxEls.length && !prefersReduced) {
     { passive: true }
   );
   run();
-}
+});
 
 /* ── 4. MENU MOBILE ───────────────────────────────────────── */
-const menuToggle = document.getElementById('menu-toggle');
-const menuClose = document.getElementById('menu-close');
-const panel = document.getElementById('mobile-panel');
-function setMenu(open: boolean) {
-  if (!panel) return;
-  panel.hidden = !open;
-  document.body.style.overflow = open ? 'hidden' : '';
-  menuToggle?.setAttribute('aria-expanded', String(open));
-}
-menuToggle?.addEventListener('click', () => setMenu(true));
-menuClose?.addEventListener('click', () => setMenu(false));
-panel?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+aman('menu-mobile', () => {
+  const menuToggle = document.getElementById('menu-toggle');
+  const menuClose = document.getElementById('menu-close');
+  const panel = document.getElementById('mobile-panel');
+  if (!menuToggle || !panel) return;
+
+  let terbuka = false;
+
+  const setMenu = (open: boolean) => {
+    terbuka = open;
+    panel.hidden = !open;
+    menuToggle.setAttribute('aria-expanded', String(open));
+    menuToggle.setAttribute('aria-label', open ? 'Tutup menu' : 'Buka menu');
+    // Kunci gulir latar agar panel tidak tembus ke halaman di belakangnya.
+    document.body.style.overflow = open ? 'hidden' : '';
+  };
+
+  menuToggle.addEventListener('click', () => setMenu(!terbuka));
+  menuClose?.addEventListener('click', () => setMenu(false));
+
+  // Menutup panel setelah memilih tautan — termasuk saat berpindah halaman.
+  panel.querySelectorAll('a').forEach((a) =>
+    a.addEventListener('click', () => setMenu(false))
+  );
+
+  // Escape menutup panel (kebiasaan papan ketik & aksesibilitas).
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && terbuka) setMenu(false);
+  });
+
+  // Kembali ke tata letak desktop menghapus kunci gulir, supaya
+  // halaman tidak "beku" bila layar diputar saat menu terbuka.
+  window.addEventListener('resize', () => {
+    if (terbuka && window.innerWidth > 900) setMenu(false);
+  });
+});
 
 /* ── 5. PENCARIAN ─────────────────────────────────────────── */
-type Doc = {
-  title: string;
-  dek: string;
-  slug: string;
-  rubrik: string;
-  author: string;
-  date: string;
-  tags: string[];
-  text: string;
-};
+aman('pencarian', () => {
+  type Hasil = { slug: string; title: string; rubrik: string; excerpt?: string };
 
-const dialog = document.getElementById('search-dialog');
-const input = document.getElementById('search-input') as HTMLInputElement | null;
-const results = document.getElementById('search-results');
-const openBtn = document.getElementById('search-open');
-const closeBtn = document.getElementById('search-close');
-const backdrop = document.getElementById('search-backdrop');
+  const dialog = document.getElementById('search-dialog');
+  const input = document.getElementById('search-input') as HTMLInputElement | null;
+  const results = document.getElementById('search-results');
+  const openBtn = document.getElementById('search-open');
+  const closeBtn = document.getElementById('search-close');
+  const backdrop = document.getElementById('search-backdrop');
+  if (!dialog || !input || !results) return;
 
-let docs: Doc[] = [];
-const idxEl = document.getElementById('search-index');
-if (idxEl?.textContent) {
+  const idxEl = document.getElementById('search-index');
+  let indeks: Hasil[] = [];
   try {
-    docs = JSON.parse(idxEl.textContent);
+    indeks = JSON.parse(idxEl?.textContent || '[]');
   } catch {
-    docs = [];
-  }
-}
-
-function escapeHtml(s: string) {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
-}
-
-function highlight(text: string, q: string) {
-  if (!q) return escapeHtml(text);
-  const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return escapeHtml(text).replace(new RegExp(`(${safe})`, 'gi'), '<mark>$1</mark>');
-}
-
-function render(q: string) {
-  if (!results) return;
-  const term = q.trim().toLowerCase();
-  if (term.length < 2) {
-    results.innerHTML = '';
-    return;
-  }
-  const words = term.split(/\s+/);
-  const hits = docs
-    .map((d) => {
-      let score = 0;
-      words.forEach((w) => {
-        if (d.title.toLowerCase().includes(w)) score += 6;
-        if (d.tags.join(' ').toLowerCase().includes(w)) score += 3;
-        if (d.text.includes(w)) score += 1;
-      });
-      return { d, score };
-    })
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 7);
-
-  if (!hits.length) {
-    results.innerHTML = `<div class="sr-empty">Tidak ditemukan tulisan untuk “${escapeHtml(q)}”. Coba kata lain.</div>`;
-    return;
+    indeks = [];
   }
 
-  results.innerHTML = hits
-    .map(
-      ({ d }) => `
-      <a class="sr" href="/tulisan/${d.slug}">
-        <span class="sr__rubrik">${escapeHtml(d.rubrik)}</span>
-        <span class="sr__title">${highlight(d.title, q.trim())}</span>
-        <span class="sr__meta">${escapeHtml(d.author)} · ${escapeHtml(d.date)}</span>
-      </a>`
-    )
-    .join('');
-}
+  const escapeHtml = (s: string) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string)
+    );
 
-function openSearch() {
-  if (!dialog) return;
-  dialog.hidden = false;
-  document.body.style.overflow = 'hidden';
-  setTimeout(() => input?.focus(), 80);
-}
-function closeSearch() {
-  if (!dialog) return;
-  dialog.hidden = true;
-  document.body.style.overflow = '';
-  if (input) input.value = '';
-  if (results) results.innerHTML = '';
-}
+  const highlight = (text: string, q: string) => {
+    if (!q) return escapeHtml(text);
+    const i = text.toLowerCase().indexOf(q.toLowerCase());
+    if (i < 0) return escapeHtml(text);
+    return (
+      escapeHtml(text.slice(0, i)) +
+      '<mark>' +
+      escapeHtml(text.slice(i, i + q.length)) +
+      '</mark>' +
+      escapeHtml(text.slice(i + q.length))
+    );
+  };
 
-openBtn?.addEventListener('click', openSearch);
-closeBtn?.addEventListener('click', closeSearch);
-backdrop?.addEventListener('click', closeSearch);
-input?.addEventListener('input', (e) => render((e.target as HTMLInputElement).value));
-document.querySelectorAll<HTMLButtonElement>('.search__hint button').forEach((b) =>
-  b.addEventListener('click', () => {
-    if (!input) return;
-    input.value = b.dataset.q || '';
+  const render = (q: string) => {
+    const tanya = q.trim();
+    if (!tanya) {
+      results.innerHTML =
+        '<p class="search__hint">Ketik kata kunci: rubrik, judul, atau nama penulis.</p>';
+      return;
+    }
+    const ketemu = indeks
+      .filter(
+        (a) =>
+          a.title.toLowerCase().includes(tanya.toLowerCase()) ||
+          a.rubrik.toLowerCase().includes(tanya.toLowerCase()) ||
+          (a.excerpt || '').toLowerCase().includes(tanya.toLowerCase())
+      )
+      .slice(0, 8);
+
+    results.innerHTML = ketemu.length
+      ? ketemu
+          .map(
+            (a) => `<a class="search__item" href="/tulisan/${escapeHtml(a.slug)}">
+              <span class="search__rubrik">${escapeHtml(a.rubrik)}</span>
+              <span class="search__title">${highlight(a.title, tanya)}</span>
+            </a>`
+          )
+          .join('')
+      : `<p class="search__hint">Tidak ada tulisan yang cocok dengan “${escapeHtml(tanya)}”.</p>`;
+  };
+
+  const openSearch = () => {
+    dialog.hidden = false;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => input.focus(), 40);
     render(input.value);
-    input.focus();
-  })
-);
+  };
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    if (dialog && !dialog.hidden) closeSearch();
-    if (panel && !panel.hidden) setMenu(false);
-  }
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-    e.preventDefault();
-    openSearch();
-  }
+  const closeSearch = () => {
+    dialog.hidden = true;
+    document.body.style.overflow = '';
+  };
+
+  openBtn?.addEventListener('click', openSearch);
+  closeBtn?.addEventListener('click', closeSearch);
+  backdrop?.addEventListener('click', closeSearch);
+  input.addEventListener('input', (e) => render((e.target as HTMLInputElement).value));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !dialog.hidden) closeSearch();
+  });
+
+  render('');
 });
 
 /* ── 6. NEWSLETTER ────────────────────────────────────────── */
-const nForm = document.getElementById('footer-newsletter') as HTMLFormElement | null;
-const nNote = document.getElementById('foot-note');
-nForm?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const email = (nForm.querySelector('input[name="email"]') as HTMLInputElement)?.value.trim();
-  if (!nNote) return;
-  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    nNote.textContent = 'Alamat surel belum tepat. Coba periksa lagi.';
-    nNote.className = 'foot__form-note is-err';
-    return;
-  }
-  nNote.textContent = 'Terima kasih. Surat Swara akan tiba setiap Jumat.';
-  nNote.className = 'foot__form-note is-ok';
-  nForm.reset();
+aman('newsletter', () => {
+  const nForm = document.getElementById('footer-newsletter') as HTMLFormElement | null;
+  const nNote = document.getElementById('foot-note');
+  nForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = (nForm.querySelector('input[type="email"]') as HTMLInputElement | null)?.value || '';
+    if (nNote) {
+      nNote.textContent = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)
+        ? 'Terima kasih. Kabar edisi berikutnya akan kami kirim ke surel Anda.'
+        : 'Alamat surel belum tepat. Mohon periksa lagi.';
+    }
+  });
 });
 
 /* ── 7. TEMA TERANG/GELAP baca ────────────────────────────── */
-const themeBtn = document.getElementById('reader-theme');
-if (themeBtn) {
-  const stored = localStorage.getItem('sb-theme');
-  if (stored === 'dark') document.documentElement.dataset.reader = 'dark';
+aman('tema-baca', () => {
+  const themeBtn = document.getElementById('reader-theme');
+  if (!themeBtn) return;
+  const KEY = 'sb-theme';
+  const terapkan = (mode: string) => {
+    document.documentElement.dataset.theme = mode;
+    themeBtn.setAttribute('aria-pressed', String(mode === 'dark'));
+  };
+  let tersimpan = 'light';
+  try {
+    tersimpan = localStorage.getItem(KEY) || 'light';
+  } catch {
+    /* localStorage bisa diblokir */
+  }
+  terapkan(tersimpan);
   themeBtn.addEventListener('click', () => {
-    const isDark = document.documentElement.dataset.reader === 'dark';
-    document.documentElement.dataset.reader = isDark ? 'light' : 'dark';
-    localStorage.setItem('sb-theme', isDark ? 'light' : 'dark');
+    const baru = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    terapkan(baru);
+    try {
+      localStorage.setItem(KEY, baru);
+    } catch {
+      /* abaikan */
+    }
   });
-}
+});
 
 /* ── 8. TAHUN DI FOOTER / MARQUEE PAUSE ───────────────────── */
-document.querySelectorAll<HTMLElement>('[data-marquee]').forEach((el) => {
-  el.addEventListener('mouseenter', () => (el.style.animationPlayState = 'paused'));
-  el.addEventListener('mouseleave', () => (el.style.animationPlayState = 'running'));
+aman('marquee', () => {
+  document.querySelectorAll<HTMLElement>('[data-pause]').forEach((el) => {
+    el.addEventListener('mouseenter', () => (el.style.animationPlayState = 'paused'));
+    el.addEventListener('mouseleave', () => (el.style.animationPlayState = 'running'));
+  });
+  document.querySelector<HTMLElement>('[data-marquee]')?.addEventListener(
+    'mouseenter',
+    (e) => ((e.currentTarget as HTMLElement).style.animationPlayState = 'paused')
+  );
+  document.querySelector<HTMLElement>('[data-marquee]')?.addEventListener(
+    'mouseleave',
+    (e) => ((e.currentTarget as HTMLElement).style.animationPlayState = 'running')
+  );
 });
-const track = document.querySelector<HTMLElement>('[data-marquee]');
-if (track) {
-  track.addEventListener('mouseenter', () => (track.style.animationPlayState = 'paused'));
-  track.addEventListener('mouseleave', () => (track.style.animationPlayState = 'running'));
-}
 
 /* ── 9. HEADER: ringkas saat gulir turun ──────────────────────
    Hanya menambah/menghapus kelas saat status BENAR-BENAR berubah.
    Versi lama memanggil classList.add/remove pada setiap frame gulir,
    yang memaksa peramban mengurai ulang gaya header terus-menerus —
    sebagian dari penyebab layar terasa berkedip. */
-const masthead = document.getElementById('masthead');
-if (masthead) {
-  let lastY = window.scrollY;
+aman('header-ringkas', () => {
+  const masthead = document.getElementById('masthead');
+  if (!masthead) return;
   let compact = false;
   const threshold = 200;
   const hysteresis = 40;
@@ -271,43 +320,46 @@ if (masthead) {
         compact = next;
         masthead.classList.toggle('is-compact', compact);
       }
-      lastY = y;
     },
     { passive: true }
   );
-  void lastY;
-}
+});
 
 /* ── 10. INDIKATOR RUANG BACA ─────────────────────────────── */
-const shelf = document.querySelector<HTMLElement>('.shelf-btn');
-if (shelf) {
+aman('indikator-ruang-baca', () => {
+  const shelf = document.querySelector<HTMLElement>('.shelf-btn');
+  if (!shelf) return;
   try {
     const saved = JSON.parse(localStorage.getItem('sb-saved') || '[]');
     if (saved.length) shelf.classList.add('has-items');
   } catch {
     /* abaikan */
   }
-}
+});
 
 /* ── 11. SMOOTH JUMP UNTUK TAUTAN ANCHOR ──────────────────── */
-document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
-  a.addEventListener('click', (e) => {
-    const id = a.getAttribute('href');
-    if (!id || id === '#') return;
-    const target = document.querySelector(id);
-    if (target) {
-      e.preventDefault();
-      target.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
-    }
+aman('anchor', () => {
+  document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href');
+      if (!id || id === '#') return;
+      const target = document.querySelector(id);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+      }
+    });
   });
 });
 
 /* ── 12. HEMAT DAYA: jeda animasi saat tab tak terlihat ───────
    Marquee dan denyut topbar berhenti saat tab disembunyikan,
    sehingga tidak ada kerja GPU tersisa di latar belakang. */
-document.addEventListener('visibilitychange', () => {
-  const paused = document.hidden;
-  document.querySelectorAll<HTMLElement>('[data-marquee]').forEach((el) => {
-    el.style.animationPlayState = paused ? 'paused' : 'running';
+aman('hemat-daya', () => {
+  document.addEventListener('visibilitychange', () => {
+    const paused = document.hidden;
+    document.querySelectorAll<HTMLElement>('[data-marquee]').forEach((el) => {
+      el.style.animationPlayState = paused ? 'paused' : 'running';
+    });
   });
 });

@@ -191,10 +191,16 @@ const SITE = 'Swara Bestari';
             </div>
           </header>
 
+          <p class="note">
+            Semua yang Anda ubah di halaman ini tampil di <strong>/iklan</strong> dan
+            di <strong>media kit PDF</strong>. Setelah menekan “Simpan perubahan”,
+            tunggu 1–2 menit lalu muat ulang halaman iklan.
+          </p>
+
           <div class="panel">
             <div class="panel__h">
               <h2 class="panel__t">Slot iklan</h2>
-              <span class="panel__meta">Ubah tarif & catatan</span>
+              <span class="panel__meta">Tarif &amp; catatan per slot</span>
             </div>
             <div class="tblwrap">
               <table class="tbl">
@@ -209,14 +215,29 @@ const SITE = 'Swara Bestari';
           <div class="panel">
             <div class="panel__h">
               <h2 class="panel__t">Paket kemitraan</h2>
-              <span class="panel__meta">Tampil di /iklan</span>
+              <span class="panel__meta">Kartu paket di /iklan</span>
             </div>
             <div class="tblwrap">
               <table class="tbl">
                 <thead>
-                  <tr><th>Paket</th><th>Harga</th><th>Ringkasan</th></tr>
+                  <tr><th>Paket</th><th>Harga</th><th>Periode</th><th>Deskripsi</th></tr>
                 </thead>
                 <tbody id="pkg-rows"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__h">
+              <h2 class="panel__t">Format iklan</h2>
+              <span class="panel__meta">Tabel ukuran &amp; tarif di /iklan</span>
+            </div>
+            <div class="tblwrap">
+              <table class="tbl">
+                <thead>
+                  <tr><th>Format</th><th>Ukuran</th><th>Tarif</th><th>Penempatan</th></tr>
+                </thead>
+                <tbody id="fmt-rows"></tbody>
               </table>
             </div>
           </div>
@@ -314,7 +335,10 @@ const SITE = 'Swara Bestari';
 
           <div class="row3">
             <label class="fld">
-              <span class="fld__label">Rubrik</span>
+              <span class="fld__label">
+                Rubrik
+                <span class="fld__hint">menentukan alamat halaman rubrik</span>
+              </span>
               <select class="inp" id="f-rubrik"></select>
             </label>
             <label class="fld">
@@ -540,6 +564,20 @@ const SITE = 'Swara Bestari';
         opacity: 0.8;
       }
       .side__nav { display: flex; flex-direction: column; gap: 2px; padding: 1rem 0.7rem; flex: 1; }
+      /* Petunjuk singkat di atas daftar panel — menjawab "ubah di mana?". */
+      .note {
+        margin: 0 0 1.25rem;
+        padding: 0.85rem 1rem;
+        background: #fdf8ec;
+        border: 1px solid #e8dcc0;
+        border-left: 3px solid var(--gold);
+        border-radius: 6px;
+        font-size: 0.86rem;
+        line-height: 1.6;
+        color: var(--ink-soft);
+      }
+      .note strong { color: var(--ink); font-weight: 600; }
+
       .snav {
         display: flex;
         align-items: center;
@@ -1266,6 +1304,18 @@ const SITE = 'Swara Bestari';
       }
 
       /* ══ Artikel ══ */
+      /* structuredClone belum ada di Safari sebelum 15.4 dan di sebagian
+         peramban dalam aplikasi. Tanpa cadangan ini, tombol Simpan pada
+         halaman iklan dan pengaturan melempar galat dan tidak berbuat apa pun. */
+      const salin = (obj) => {
+        try {
+          if (typeof structuredClone === 'function') return structuredClone(obj);
+        } catch {
+          /* lanjut ke cadangan */
+        }
+        return JSON.parse(JSON.stringify(obj));
+      };
+
       const esc = (s = '') =>
         String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -1554,9 +1604,23 @@ const SITE = 'Swara Bestari';
           .map(
             (p, i) => `
           <tr>
-            <td><span class="tbl__title">${esc(p.name)}</span></td>
-            <td><input class="inp inp--cell" data-pkg="${i}" data-field="price" value="${esc(p.price || '')}" /></td>
-            <td><input class="inp inp--cell" data-pkg="${i}" data-field="summary" value="${esc(p.summary || '')}" style="min-width:260px" /></td>
+            <td><span class="tbl__title">${esc(p.name)}</span>
+                <span class="tbl__sub">${esc(p.tier || '')}</span></td>
+            <td><input class="inp inp--cell" data-pkg="${i}" data-field="price" value="${esc(p.price || '')}" style="min-width:130px" /></td>
+            <td><input class="inp inp--cell" data-pkg="${i}" data-field="period" value="${esc(p.period || '')}" style="min-width:90px" /></td>
+            <td><input class="inp inp--cell" data-pkg="${i}" data-field="desc" value="${esc(p.desc || '')}" style="min-width:300px" /></td>
+          </tr>`
+          )
+          .join('');
+
+        $('#fmt-rows').innerHTML = (state.ads.adFormats || [])
+          .map(
+            (f, i) => `
+          <tr>
+            <td><span class="tbl__title">${esc(f.name)}</span></td>
+            <td><input class="inp inp--cell" data-fmt="${i}" data-field="size" value="${esc(f.size || '')}" style="min-width:100px" /></td>
+            <td><input class="inp inp--cell" data-fmt="${i}" data-field="rate" value="${esc(f.rate || '')}" style="min-width:130px" /></td>
+            <td><input class="inp inp--cell" data-fmt="${i}" data-field="placement" value="${esc(f.placement || '')}" style="min-width:220px" /></td>
           </tr>`
           )
           .join('');
@@ -1573,7 +1637,7 @@ const SITE = 'Swara Bestari';
       }
 
       $('#save-ads-btn').addEventListener('click', async () => {
-        const ads = structuredClone(state.ads);
+        const ads = salin(state.ads);
         $$('[data-slot]').forEach((el) => {
           const key = el.dataset.slot;
           if (ads.adSlots[key]) ads.adSlots[key][el.dataset.field] = el.value;
@@ -1585,6 +1649,10 @@ const SITE = 'Swara Bestari';
         $$('[data-aud]').forEach((el) => {
           const i = Number(el.dataset.aud);
           if (ads.audience[i]) ads.audience[i].value = el.value;
+        });
+        $$('[data-fmt]').forEach((el) => {
+          const i = Number(el.dataset.fmt);
+          if (ads.adFormats[i]) ads.adFormats[i][el.dataset.field] = el.value;
         });
 
         const btn = $('#save-ads-btn');
@@ -1700,6 +1768,9 @@ const SITE = 'Swara Bestari';
           .map(
             (r, i) => `
           <div class="mini-grid" style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #f0ebdf">
+            <div class="fld" style="grid-column:1/-1">
+              <span class="fld__label">${esc(r.name)} <span class="fld__hint">slug: ${esc(r.slug)} — jangan diubah, alamat artikel bergantung padanya</span></span>
+            </div>
             <label class="fld">
               <span class="fld__label">${esc(r.name)} — tagline</span>
               <input class="inp" data-rub="${i}" data-field="tagline" value="${esc(r.tagline || '')}" />
@@ -1714,7 +1785,7 @@ const SITE = 'Swara Bestari';
       }
 
       $('#save-settings-btn').addEventListener('click', async () => {
-        const settings = structuredClone(state.settings);
+        const settings = salin(state.settings);
         $$('[data-site]').forEach((el) => {
           settings.site[el.dataset.site] = el.value;
         });
