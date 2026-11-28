@@ -255,7 +255,8 @@ async function main() {
   }
 
   for (const r of rubrik) {
-    const first = articles.find((a) => a.rubrik === r.name);
+    // Artikel menyimpan slug rubrik ('kronik'), bukan nama tampilan ('Kronik').
+    const first = articles.find((a) => a.rubrik === r.slug);
     jobs.push({
       out: `rubrik-${r.slug}.jpg`,
       eyebrow: `Rubrik ${r.index}`,
@@ -294,7 +295,26 @@ async function main() {
     })
   );
 
-  console.log(`✓ ${results.length} gambar pratinjau dibuat di public/og/`);
+  /* Hapus gambar pratinjau milik artikel yang sudah tidak ada.
+     Tanpa ini, public/og/ menumpuk berkas yatim setiap kali artikel dihapus,
+     dan repositori ikut membengkak tanpa manfaat. */
+  const { readdir, unlink } = await import('node:fs/promises');
+  const sah = new Set(jobs.map((j) => j.out));
+  /* Halaman tetap digambar dari daftar `pages` di bawah; rubrik dari `rubrik`.
+     Semuanya sudah ada di `jobs`, jadi cukup sisakan yang tidak dipakai. */
+  let dibersihkan = 0;
+  for (const f of await readdir(OUT)) {
+    if (!f.endsWith('.jpg')) continue;
+    if (sah.has(f)) continue;
+    if (f.startsWith('rubrik-')) continue;
+    await unlink(path.join(OUT, f));
+    dibersihkan++;
+  }
+
+  console.log(
+    `✓ ${results.length} gambar pratinjau dibuat di public/og/` +
+      (dibersihkan ? ` · ${dibersihkan} berkas yatim dibersihkan` : '')
+  );
 }
 
 main().catch((e) => {

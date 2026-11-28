@@ -13,7 +13,18 @@
 // ─────────────────────────────────────────────────────────────
 import articlesData from './content/articles.json' with { type: 'json' };
 
-export const articles = articlesData;
+/**
+ * Hanya artikel yang sudah terbit.
+ *
+ * Artikel berstatus 'draft' disimpan di repositori (agar penulis bisa
+ * menyiapkan tulisan panjang) tetapi TIDAK boleh muncul di halaman publik:
+ * tidak di beranda, arsip, rubrik, pencarian, sitemap, maupun sebagai
+ * halaman /tulisan/<slug>/.
+ *
+ * Artikel lama yang belum punya bidang `status` dianggap sudah terbit,
+ * sehingga perubahan ini tidak menyembunyikan tulisan yang sudah tayang.
+ */
+export const articles = articlesData.filter((a) => a.status !== 'draft');
 export const bySlug = Object.fromEntries(articles.map((a) => [a.slug, a]));
 
 export const byRubrik = (slug) => articles.filter((a) => a.rubrik === slug);

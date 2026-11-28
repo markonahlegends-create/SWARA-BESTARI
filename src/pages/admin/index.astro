@@ -342,108 +342,143 @@ const SITE = 'Swara Bestari';
         <form class="drawer__body" id="article-form">
           <input type="hidden" id="f-original-slug" />
 
-          <label class="fld">
-            <span class="fld__label">Judul</span>
-            <input class="inp" id="f-title" required />
-          </label>
+          {/* Dua kolom ala WordPress: kiri untuk menulis, kanan untuk
+              pengaturan terbit. Semua bidang tetap sama — hanya ditata
+              supaya mata tidak harus menyusuri satu kolom panjang. */}
+          <div class="wpedit">
+            <!-- ══════════ KOLOM UTAMA ══════════ -->
+            <div class="wpedit__main">
+              <input
+                class="wpedit__title"
+                id="f-title"
+                placeholder="Tulis judul di sini…"
+                aria-label="Judul artikel"
+                required
+              />
 
-          <div class="row3">
-            <label class="fld">
-              <span class="fld__label">
-                Rubrik
-                <span class="fld__hint">menentukan alamat halaman rubrik</span>
-              </span>
-              <select class="inp" id="f-rubrik"></select>
-            </label>
-            <label class="fld">
-              <span class="fld__label">Tanggal terbit</span>
-              <input class="inp" type="date" id="f-date" />
-            </label>
-            <label class="fld">
-              <span class="fld__label">Menit baca</span>
-              <input class="inp" type="number" min="1" id="f-reading" />
-            </label>
-          </div>
+              <label class="fld">
+                <span class="fld__label">Anak judul <span class="fld__hint">opsional — satu kalimat pengantar di bawah judul</span></span>
+                <input class="inp" id="f-sujudul" placeholder="Kalimat yang memperjelas judul" />
+              </label>
 
-          <label class="fld">
-            <span class="fld__label">Slug URL <span class="fld__hint">otomatis dari judul</span></span>
-            <input class="inp" id="f-slug" placeholder="pasar-yang-menolak-digusur" />
-          </label>
+              <label class="fld">
+                <span class="fld__label">Ringkasan <span class="fld__hint">tampil di kartu beranda dan hasil pencarian</span></span>
+                <textarea class="inp inp--area" rows="2" id="f-dek" placeholder="Dua–tiga baris yang membuat orang ingin membaca."></textarea>
+              </label>
 
-          <label class="fld">
-            <span class="fld__label">Anak judul <span class="fld__hint">opsional, tampil di bawah judul</span></span>
-            <input class="inp" id="f-sujudul" />
-          </label>
-
-          <label class="fld">
-            <span class="fld__label">Ringkasan (dek)</span>
-            <textarea class="inp inp--area" rows="2" id="f-dek"></textarea>
-          </label>
-
-          <div class="row3">
-            <label class="fld">
-              <span class="fld__label">Penulis</span>
-              <input class="inp" id="f-author" />
-            </label>
-            <label class="fld">
-              <span class="fld__label">Peran penulis</span>
-              <input class="inp" id="f-authorRole" />
-            </label>
-            <label class="fld">
-              <span class="fld__label">Tag <span class="fld__hint">pisahkan koma</span></span>
-              <input class="inp" id="f-tags" />
-            </label>
-          </div>
-
-          <div class="fld">
-            <span class="fld__label">Gambar utama</span>
-            <div class="imgrow">
-              <select class="inp" id="f-image"></select>
-              <button type="button" class="btn btn--ghost" id="upload-btn">Unggah…</button>
-            </div>
-            <input type="file" id="upload-input" accept="image/*" hidden />
-            <p class="fld__hint" id="upload-note">
-              Unggah foto dari komputer atau ponsel — otomatis dikompres ke maksimal 1600 px.
-            </p>
-            <img id="img-preview" class="imgprev" alt="" />
-          </div>
-
-          <label class="fld">
-            <span class="fld__label">Teks alternatif gambar</span>
-            <input class="inp" id="f-imageAlt" />
-          </label>
-
-          <div class="fld">
-            <span class="fld__label">
-              Isi tulisan
-              <span class="fld__hint">Tulis biasa saja — tidak perlu tanda apa pun.</span>
-            </span>
-
-            <div class="beditor">
-              <div class="beditor__list" id="bed-blocks"></div>
-              <div class="beditor__add">
-                <button type="button" class="btn btn--ghost" data-bed-add="p">+ Paragraf</button>
-                <button type="button" class="btn btn--ghost" data-bed-add="h2">+ Subjudul</button>
-                <button type="button" class="btn btn--ghost" data-bed-add="quote">+ Kutipan</button>
+              <div class="wpedit__section">
+                <div class="wpedit__sectionhead">
+                  <span class="wpedit__sectiontitle">Isi tulisan</span>
+                  <span class="fld__hint">Tulis biasa saja — tidak perlu tanda apa pun.</span>
+                </div>
+                <div class="beditor">
+                  <div class="beditor__list" id="bed-blocks"></div>
+                  <div class="beditor__add">
+                    <button type="button" class="btn btn--ghost" data-bed-add="p">+ Paragraf</button>
+                    <button type="button" class="btn btn--ghost" data-bed-add="h2">+ Subjudul</button>
+                    <button type="button" class="btn btn--ghost" data-bed-add="quote">+ Kutipan</button>
+                  </div>
+                  <p class="fld__hint">
+                    Tekan Enter dua kali di dalam paragraf untuk memecahnya menjadi dua paragraf.
+                  </p>
+                </div>
               </div>
-              <p class="fld__hint">
-                Tekan Enter dua kali di dalam paragraf untuk memecahnya menjadi dua paragraf.
-              </p>
             </div>
-          </div>
 
-          <label class="fld fld--check">
-            <input type="checkbox" id="f-feature" />
-            <span>Tampilkan sebagai unggulan di beranda</span>
-          </label>
+            <!-- ══════════ SIDEBAR PENGATURAN ══════════ -->
+            <aside class="wpedit__side">
+              <div class="wpside">
+                <div class="wpside__h">Terbitkan</div>
+                <div class="wpside__body">
+                  <label class="fld">
+                    <span class="fld__label">Status</span>
+                    <select class="inp" id="f-status">
+                      <option value="publish">Terbit</option>
+                      <option value="draft">Draf</option>
+                    </select>
+                    <p class="fld__hint" id="status-note">
+                      Artikel terbit langsung tampil di situs setelah disimpan.
+                    </p>
+                  </label>
 
-          <p class="drawer__err" id="drawer-err" hidden></p>
+                  <label class="fld fld--check">
+                    <input type="checkbox" id="f-feature" />
+                    <span>Jadikan sorotan utama beranda</span>
+                  </label>
 
-          <div class="drawer__foot">
-            <button type="button" class="btn btn--ghost" data-close>Batal</button>
-            <button type="submit" class="btn btn--gold" id="save-article-btn">
-              Simpan & terbitkan
-            </button>
+                  <label class="fld">
+                    <span class="fld__label">Tanggal terbit</span>
+                    <input class="inp" type="date" id="f-date" />
+                  </label>
+
+                  <label class="fld">
+                    <span class="fld__label">Menit baca</span>
+                    <input class="inp" type="number" min="1" id="f-reading" />
+                  </label>
+
+                  <button type="submit" class="btn btn--gold wpside__submit" id="save-article-btn">
+                    Simpan artikel
+                  </button>
+                  <button type="button" class="btn btn--ghost wpside__cancel" data-close>Batal</button>
+                  <p class="drawer__err" id="drawer-err" hidden></p>
+                </div>
+              </div>
+
+              <div class="wpside">
+                <div class="wpside__h">Rubrik &amp; penulis</div>
+                <div class="wpside__body">
+                  <label class="fld">
+                    <span class="fld__label">Rubrik</span>
+                    <select class="inp" id="f-rubrik"></select>
+                  </label>
+                  <label class="fld">
+                    <span class="fld__label">Penulis</span>
+                    <input class="inp" id="f-author" />
+                  </label>
+                  <label class="fld">
+                    <span class="fld__label">Peran penulis</span>
+                    <input class="inp" id="f-authorRole" placeholder="mis. Redaktur Kronik" />
+                  </label>
+                  <label class="fld">
+                    <span class="fld__label">Tag <span class="fld__hint">pisahkan dengan koma</span></span>
+                    <input class="inp" id="f-tags" placeholder="kota, sejarah lisan, semarang" />
+                  </label>
+                </div>
+              </div>
+
+              <div class="wpside">
+                <div class="wpside__h">Alamat halaman</div>
+                <div class="wpside__body">
+                  <label class="fld">
+                    <span class="fld__label">Slug URL <span class="fld__hint">terisi otomatis dari judul</span></span>
+                    <input class="inp inp--mono" id="f-slug" placeholder="pasar-yang-menolak-digusur" />
+                  </label>
+                  <p class="fld__hint">swara-bestari.vercel.app/tulisan/<strong id="slug-preview">…</strong></p>
+                </div>
+              </div>
+
+              <div class="wpside">
+                <div class="wpside__h">Gambar utama</div>
+                <div class="wpside__body">
+                  <div class="wpside__thumb" id="img-preview-wrap">
+                    <img id="img-preview" alt="" />
+                    <span id="img-preview-empty">Belum ada gambar</span>
+                  </div>
+                  <div class="imgrow">
+                    <select class="inp" id="f-image" aria-label="Gambar utama"></select>
+                    <button type="button" class="btn btn--ghost btn--sm" id="upload-btn">Unggah…</button>
+                  </div>
+                  <input type="file" id="upload-input" accept="image/*" hidden />
+                  <p class="fld__hint" id="upload-note">
+                    Unggah foto dari komputer atau ponsel — otomatis dikompres ke maksimal 1600 px.
+                  </p>
+                  <label class="fld">
+                    <span class="fld__label">Teks alternatif <span class="fld__hint">untuk pembaca layar</span></span>
+                    <input class="inp" id="f-imageAlt" placeholder="Deskripsi singkat isi gambar" />
+                  </label>
+                </div>
+              </div>
+            </aside>
           </div>
         </form>
       </div>
@@ -847,6 +882,12 @@ const SITE = 'Swara Bestari';
         color: var(--ink-soft);
       }
       .iact:hover { border-color: var(--gold); color: var(--gold); }
+      .iact--off {
+        border-style: dashed;
+        border-color: #d9d0bd;
+        color: #9c917c;
+        cursor: default;
+      }
       .iact--del:hover { border-color: var(--err); color: var(--err); }
 
       .pill {
@@ -860,6 +901,8 @@ const SITE = 'Swara Bestari';
         color: #7a5c1f;
       }
       .pill--live { background: #e4f0e8; color: var(--ok); }
+      .pill--draft { background: #f2eee4; color: #7d7362; border: 1px dashed #cfc4ae; }
+      .pill--gold { background: var(--gold-soft); color: #7a5c1f; margin-left: 0.2rem; }
 
       /* ══ Formulir ══ */
       .fld { display: grid; gap: 0.35rem; }
@@ -1038,7 +1081,7 @@ const SITE = 'Swara Bestari';
       .drawer__panel {
         position: absolute;
         inset: 0 0 0 auto;
-        width: min(760px, 100%);
+        width: min(1080px, 100%);
         background: var(--card);
         display: flex;
         flex-direction: column;
@@ -1048,6 +1091,7 @@ const SITE = 'Swara Bestari';
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 1rem;
         padding: 1.1rem 1.5rem;
         border-bottom: 1px solid var(--line);
         flex: none;
@@ -1065,20 +1109,91 @@ const SITE = 'Swara Bestari';
       .drawer__body {
         padding: 1.5rem;
         overflow-y: auto;
-        display: grid;
-        gap: 1.1rem;
         flex: 1;
       }
-      .drawer__foot {
+
+      /* ══ Editor dua kolom ala WordPress ══ */
+      .wpedit {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 290px;
+        gap: 1.5rem;
+        align-items: start;
+      }
+      .wpedit__main { display: grid; gap: 1.1rem; min-width: 0; }
+
+      /* Judul besar seperti kolom judul di WordPress — langsung terasa
+         "ini tempat menulis", bukan salah satu dari sekian kotak isian. */
+      .wpedit__title {
+        width: 100%;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        background: transparent;
+        padding: 0.3rem 0 0.7rem;
+        font-family: 'Bodoni Moda', Georgia, serif;
+        font-size: 1.65rem;
+        font-weight: 500;
+        color: var(--ink);
+        line-height: 1.25;
+      }
+      .wpedit__title::placeholder { color: #b9ae9a; }
+      .wpedit__title:focus { outline: none; border-bottom-color: var(--gold); }
+
+      .wpedit__section { border-top: 1px solid var(--line); padding-top: 1.1rem; }
+      .wpedit__sectionhead {
         display: flex;
-        justify-content: flex-end;
-        gap: 0.6rem;
-        padding-top: 1rem;
-        border-top: 1px solid var(--line);
-        position: sticky;
-        bottom: -1.5rem;
-        background: var(--card);
-        padding-bottom: 0.5rem;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.7rem;
+      }
+      .wpedit__sectiontitle { font-weight: 600; font-size: 0.9rem; }
+
+      /* Sidebar: kotak-kotak bertumpuk, seperti metabox WordPress. */
+      .wpedit__side { display: grid; gap: 1rem; position: sticky; top: 0; }
+      .wpside {
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: #fff;
+        overflow: hidden;
+      }
+      .wpside__h {
+        padding: 0.55rem 0.85rem;
+        background: #faf7f0;
+        border-bottom: 1px solid var(--line);
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+      }
+      .wpside__body { padding: 0.85rem; display: grid; gap: 0.8rem; }
+      .wpside__submit { width: 100%; justify-content: center; }
+      .wpside__cancel { width: 100%; justify-content: center; font-size: 0.82rem; }
+      .wpside__thumb {
+        position: relative;
+        border: 1px dashed var(--line);
+        border-radius: 3px;
+        background: #fbf9f4;
+        aspect-ratio: 16 / 10;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+      .wpside__thumb img { width: 100%; height: 100%; object-fit: cover; display: none; }
+      .wpside__thumb.has-img img { display: block; }
+      .wpside__thumb.has-img #img-preview-empty { display: none; }
+      #img-preview-empty {
+        font-size: 0.76rem;
+        color: var(--ink-soft);
+        text-align: center;
+        padding: 0.4rem;
+      }
+
+      @media (max-width: 860px) {
+        .wpedit { grid-template-columns: 1fr; }
+        .wpedit__side { position: static; }
+        .wpedit__title { font-size: 1.35rem; }
       }
       .drawer__err {
         margin: 0;
@@ -1477,9 +1592,16 @@ const SITE = 'Swara Bestari';
                 <span class="tbl__sub">/${esc(a.slug)}</span></td>
             <td><span class="pill">${esc(a.rubrik)}</span></td>
             <td>${esc(a.date)}</td>
-            <td>${a.feature ? '<span class="pill pill--live">Unggulan</span>' : '<span class="pill">Biasa</span>'}</td>
+            <td>
+              ${a.status === 'draft'
+                ? '<span class="pill pill--draft">Draf</span>'
+                : '<span class="pill pill--live">Terbit</span>'}
+              ${a.feature ? '<span class="pill pill--gold">Unggulan</span>' : ''}
+            </td>
             <td><div class="tbl__act">
-              <a class="iact" href="/tulisan/${esc(a.slug)}" target="_blank" rel="noopener">Lihat</a>
+              ${a.status === 'draft'
+                ? '<span class="iact iact--off" title="Draf belum bisa dibaca pengunjung">Belum tayang</span>'
+                : `<a class="iact" href="/tulisan/${esc(a.slug)}" target="_blank" rel="noopener">Lihat</a>`}
               <button class="iact" data-edit="${esc(a.slug)}">Ubah</button>
               <button class="iact iact--del" data-del="${esc(a.slug)}">Hapus</button>
             </div></td>
@@ -1500,7 +1622,25 @@ const SITE = 'Swara Bestari';
         if (delBtn) {
           const slug = delBtn.dataset.del;
           const a = state.articles.find((x) => x.slug === slug);
-          if (!confirm(`Hapus "${a?.title}"?\n\nTindakan ini menulis ulang repositori dan tidak bisa dibatalkan dari dashboard.`)) return;
+
+          /* Beri tahu dampaknya sebelum menghapus. Beranda memilih isinya
+             sendiri dari artikel yang ada, jadi menghapus artikel TIDAK
+             merusak situs — tetapi pembaca akan kehilangan tulisan itu, dan
+             bila unggulan yang dihapus, sorotan beranda ikut berpindah. */
+          const sisa = state.articles.filter((x) => x.slug !== slug);
+          const terbit = sisa.filter((x) => x.status !== 'draft');
+          const catatan = [];
+          if (a?.status === 'draft') {
+            catatan.push('Artikel ini masih DRAF (belum pernah tayang).');
+          } else if (a?.feature) {
+            catatan.push('Artikel ini sedang menjadi sorotan utama di beranda.');
+          }
+          if (terbit.length === 0 && a?.status !== 'draft') {
+            catatan.push('Ini artikel terbit TERAKHIR — beranda akan menampilkan keadaan kosong.');
+          }
+          const info = catatan.length ? `\n\n${catatan.join('\n')}` : '';
+
+          if (!confirm(`Hapus "${a?.title}"?${info}\n\nTindakan ini menulis ulang repositori dan tidak bisa dibatalkan dari dashboard.`)) return;
           try {
             await api('delete-article', { slug });
             toast('Artikel dihapus. Situs sedang dibangun ulang.');
@@ -1674,6 +1814,8 @@ const SITE = 'Swara Bestari';
           imageAlt: a?.imageAlt || '',
           body: a?.body || [],
           feature: Boolean(a?.feature),
+          // Dipakai server untuk mengenali artikel mana yang diganti.
+          // Tanpa ini, menyimpan perubahan bisa menambah salinan baru.
           originalSlug: a?.slug || '',
         };
 
@@ -1712,7 +1854,15 @@ const SITE = 'Swara Bestari';
           select.value = nilai;
         }
 
+        // Status: artikel yang tidak punya bidang `status` dianggap terbit,
+        // supaya artikel lama tetap berperilaku seperti sebelumnya.
+        $('#f-status').value = a?.status === 'draft' ? 'draft' : 'publish';
+        perbaruiStatusNote();
+
         previewImage(f.image);
+        // Slug: tampilkan alamat yang akan dipakai artikel ini.
+        if (f.slug) $('#f-slug').value = f.slug;
+        perbaruiSlugPreview();
         $('#upload-note').textContent =
           'Unggah foto dari komputer atau ponsel — otomatis dikompres ke maksimal 1600 px.';
         $('#drawer').hidden = false;
@@ -1744,6 +1894,7 @@ const SITE = 'Swara Bestari';
           .replace(/[^a-z0-9\s-]/g, '')
           .trim()
           .replace(/\s+/g, '-');
+        perbaruiSlugPreview();
       });
       $('#new-article-btn').addEventListener('click', () => {
         slugTouched = false;
@@ -1789,6 +1940,7 @@ const SITE = 'Swara Bestari';
             .map((b) => ({ type: b.type, text: b.text.trim() })),
           bodyText: bedToText(),
           feature: $('#f-feature').checked,
+          status: $('#f-status').value,
         };
 
         try {
@@ -1812,11 +1964,44 @@ const SITE = 'Swara Bestari';
       /* ══ Unggah gambar ══ */
       function previewImage(src) {
         const el = $('#img-preview');
-        if (!src) return el.classList.remove('is-on');
+        const wrap = $('#img-preview-wrap');
+        if (!el || !wrap) return;
+        if (!src) {
+          wrap.classList.remove('has-img');
+          el.removeAttribute('src');
+          return;
+        }
         el.src = src;
         el.alt = 'Pratinjau gambar utama';
-        el.classList.add('is-on');
+        wrap.classList.add('has-img');
       }
+
+      /* Slug hidup: admin melihat alamat akhirnya sambil mengetik. */
+      const perbaruiSlugPreview = () => {
+        const el = $('#slug-preview');
+        if (!el) return;
+        const diketik = $('#f-slug').value.trim();
+        const dariJudul = $('#f-title').value
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .trim()
+          .replace(/\s+/g, '-');
+        el.textContent = diketik || dariJudul || '…';
+      };
+      $('#f-slug').addEventListener('input', perbaruiSlugPreview);
+
+      /* Keterangan status: menjelaskan akibat pilihan, bukan sekadar label. */
+      const perbaruiStatusNote = () => {
+        const note = $('#status-note');
+        if (!note) return;
+        note.textContent =
+          $('#f-status').value === 'draft'
+            ? 'Draf disimpan tetapi belum bisa dibaca pengunjung.'
+            : 'Artikel terbit langsung tampil di situs setelah disimpan.';
+      };
+      $('#f-status').addEventListener('change', perbaruiStatusNote);
 
       $('#f-image').addEventListener('change', (e) => previewImage(e.target.value));
 

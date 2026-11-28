@@ -484,6 +484,10 @@ export async function ALL({ request }) {
         imageAlt: cleanText(input.imageAlt) || title,
         imageCredit: cleanText(input.imageCredit) || 'Ilustrasi: Arsip Swara Bestari',
         feature: Boolean(input.feature),
+        // 'draft' menyembunyikan artikel dari seluruh halaman publik tetapi
+        // tetap menyimpannya di repositori, sehingga penulis bisa menyiapkan
+        // tulisan panjang lalu menerbitkannya belakangan.
+        status: input.status === 'draft' ? 'draft' : 'publish',
         tags: Array.isArray(input.tags)
           ? input.tags.map(cleanText).filter(Boolean)
           : String(input.tags || '')

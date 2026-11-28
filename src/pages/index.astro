@@ -14,20 +14,39 @@ import PodcastStrip from '../components/PodcastStrip.astro';
 import EditorsNote from '../components/EditorsNote.astro';
 import Manifesto from '../components/Manifesto.astro';
 import KronikBand from '../components/KronikBand.astro';
-import { site } from '../data/site.js';
+import { site, rubrikBySlug } from '../data/site.js';
 import { articles, latest, byRubrik, formatDate, shortDate } from '../data/articles.js';
 
-const hero = articles.find((a) => a.slug === 'pasar-yang-menolak-digusur')!;
-const side = [
-  articles.find((a) => a.slug === 'keindahan-sebagai-perlawanan')!,
-  articles.find((a) => a.slug === 'candi-yang-tenggelam-dalam-sawah')!,
-  articles.find((a) => a.slug === 'kembali-ke-rumah-yang-tidak-ada')!,
-];
-const essay = articles.find((a) => a.slug === 'bahasa-yang-kehilangan-penutur')!;
-const poetryFeature = articles.find((a) => a.slug === 'lukisan-yang-tidak-ingin-dijual')!;
-const humaniora = byRubrik('humaniora');
-const seni = byRubrik('seni');
-const diskursus = byRubrik('diskursus');
+/* ─────────────────────────────────────────────────────────────
+   Beranda TIDAK BOLEH mengunci slug tertentu.
+
+   Versi sebelumnya mencari lima slug tetap ('pasar-yang-menolak-digusur',
+   dst.) dengan `articles.find(...)!`. Begitu salah satu artikel itu dihapus
+   lewat dashboard, hasilnya `undefined`, lalu `hero.slug` melempar
+   TypeError dan SELURUH build situs gagal — produksi tertahan di versi
+   lama, sehingga artikel yang dihapus tetap tampil dan artikel baru tidak
+   pernah muncul.
+
+   Sekarang isi beranda dipilih dari data yang ada:
+     1. artikel yang dicentang "unggulan" (terbaru lebih dulu),
+     2. sisanya diurutkan menurut tanggal terbit.
+   Dengan begitu, beranda selalu terisi apa pun isi arsip — termasuk saat
+   hanya tersisa satu artikel atau saat semuanya dihapus.
+   ───────────────────────────────────────────────────────────── */
+const urutTerbaru = [...articles].sort((a, b) => new Date(b.date) - new Date(a.date));
+const unggulan = urutTerbaru.filter((a) => a.feature);
+const urutanBeranda = [...unggulan, ...urutTerbaru.filter((a) => !a.feature)];
+
+const hero = urutanBeranda[0];
+const side = urutanBeranda.slice(1, 4);
+const sisaBeranda = urutanBeranda.slice(4);
+
+const essay = sisaBeranda.find((a) => a.rubrik === 'esai') || sisaBeranda[0];
+const poetryFeature = sisaBeranda.find((a) => a.rubrik === 'seni') || sisaBeranda[1] || sisaBeranda[0];
+
+const humaniora = byRubrik('humaniora').sort((a, b) => new Date(b.date) - new Date(a.date));
+const seni = byRubrik('seni').sort((a, b) => new Date(b.date) - new Date(a.date));
+const diskursus = byRubrik('diskursus').sort((a, b) => new Date(b.date) - new Date(a.date));
 const ticker = latest.slice(0, 6);
 // Dimensi intrinsik gambar: mencegah layout shift saat gambar dimuat.
 const IMG_SIZES: Record<string, [number, number]> = {'art-gallery.jpg':[1400,939],'cover-current.jpg':[900,1117],'diskursus-forum.jpg':[1400,939],'esai-library.jpg':[1000,1241],'hero-kronik.jpg':[1800,1005],'humaniora-hands.jpg':[1400,939],'jejak-archive.jpg':[1400,939],'khazanah-temple.jpg':[1600,1073],'poet-portrait.jpg':[900,1117],'seni-brush.jpg':[1400,939]};
@@ -48,8 +67,18 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
 
   <!-- ═════════ HERO ═════════ -->
   <section class="hero">
+    {/* Arsip benar-benar kosong: tampilkan ajakan, bukan halaman rusak. */}
+    {!hero && (
+      <div class="wrap hero__empty">
+        <span class="eyebrow">Arsip</span>
+        <h1 class="hero__empty-title">Belum ada tulisan yang terbit.</h1>
+        <p>Tulisan yang Anda tambahkan lewat dashboard akan muncul di sini.</p>
+        <a href="/admin" class="hero__readmore">Buka dashboard <span>→</span></a>
+      </div>
+    )}
     <div class="wrap hero__grid">
-      <!-- feature besar -->
+      {/* feature besar — hanya bila ada artikel */}
+      {hero && (
       <article class="hero__lead" data-reveal>
         <a href={`/tulisan/${hero.slug}`} class="hero__imgwrap">
           <img src={hero.image} alt={hero.imageAlt} fetchpriority="high" /
@@ -61,13 +90,13 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
         </a>
         <div class="hero__body">
           <div class="hero__kicker">
-            <span class="hero__rubrik">Kronik</span>
+            <span class="hero__rubrik">{rubrikBySlug[hero.rubrik]?.name || 'Tulisan'}</span>
             <span class="hero__date">{formatDate(hero.date)} · {hero.reading} menit baca</span>
           </div>
           <h1 class="hero__title">
             <a href={`/tulisan/${hero.slug}`}>{hero.title}</a>
           </h1>
-          <p class="hero__sujudul">{hero.sujudul}</p>
+          {hero.sujudul && <p class="hero__sujudul">{hero.sujudul}</p>}
           <div class="hero__byline">
             <span class="hero__author">Oleh {hero.author}</span>
             <a href={`/tulisan/${hero.slug}`} class="hero__readmore">
@@ -76,6 +105,7 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
           </div>
         </div>
       </article>
+      )}
 
       <!-- kolom kanan -->
       <div class="hero__side">
@@ -91,7 +121,7 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
           />
             </a>
             <div class="hero__sidebody">
-              <span class="hero__siderubrik">{a.rubrik === 'esai' ? 'Esai' : a.rubrik === 'khazanah' ? 'Khazanah' : 'Humaniora'}</span>
+              <span class="hero__siderubrik">{rubrikBySlug[a.rubrik]?.name || a.rubrik}</span>
               <h3 class="hero__sidetitle"><a href={`/tulisan/${a.slug}`}>{a.title}</a></h3>
               <span class="hero__sidemeta">{a.author} · {a.reading} mnt</span>
             </div>
@@ -137,7 +167,8 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
         index="I"
       />
       <div class="curation__grid">
-        <!-- esai besar -->
+        {/* esai besar — hanya bila ada artikel tersisa */}
+        {essay && (
         <article class="curation__essay" data-reveal>
           <a href={`/tulisan/${essay.slug}`} class="curation__img">
             <img src={essay.image} alt={essay.imageAlt} loading="lazy" /
@@ -153,6 +184,7 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
           <p class="curation__excerpt">{essay.excerpt}</p>
           <a href={`/tulisan/${essay.slug}`} class="curation__more">Baca esai <span>→</span></a>
         </article>
+        )}
 
         <!-- daftar -->
         <div class="curation__list">
@@ -198,6 +230,7 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
         tone="dark"
       />
       <div class="artgrid">
+        {poetryFeature && (
         <article class="artgrid__lead" data-reveal>
           <a href={`/tulisan/${poetryFeature.slug}`} class="artgrid__img">
             <img src={poetryFeature.image} alt={poetryFeature.imageAlt} loading="lazy" /
@@ -213,6 +246,7 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
             <span class="artgrid__meta">{poetryFeature.author} · {formatDate(poetryFeature.date)}</span>
           </div>
         </article>
+        )}
         <div class="artgrid__side">
           {seni.slice(1).concat(diskursus.slice(0, 1)).map((a, i) => (
             <a href={`/tulisan/${a.slug}`} class="artgrid__item" data-reveal style={`--d:${0.07 * i}s`}>
@@ -248,6 +282,7 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
           link="/rubrik/humaniora"
           index="III"
         />
+        {humaniora[0] && (
         <div class="hub__lead" data-reveal>
           <a href={`/tulisan/${humaniora[0].slug}`} class="hub__leadimg">
             <img src={humaniora[0].image} alt={humaniora[0].imageAlt} loading="lazy" /
@@ -261,6 +296,7 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
             <span class="hub__leadmeta">{humaniora[0].author} · {humaniora[0].reading} mnt baca</span>
           </div>
         </div>
+        )}
         <div class="hub__two">
           {humaniora.slice(1).map((a, i) => (
             <ArticleCard article={a} variant="standard" />
