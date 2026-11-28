@@ -49,29 +49,6 @@
     ]
   },
   {
-    "slug": "tes-judul",
-    "rubrik": "kronik",
-    "title": "tes judul",
-    "sujudul": "sfdsafasfa",
-    "dek": "fdsafesgsdg",
-    "author": "Tim Redaksi",
-    "authorRole": "Kontributor",
-    "date": "2026-11-28",
-    "reading": 6,
-    "image": "/img/hero-kronik.jpg",
-    "imageAlt": "fsafsafa",
-    "imageCredit": "Ilustrasi: Arsip Swara Bestari",
-    "feature": true,
-    "tags": [],
-    "excerpt": "Sejarah Pasar Joha\nsfdasfasfasf",
-    "body": [
-      {
-        "type": "h2",
-        "text": "Sejarah Pasar Joha\nsfdasfasfasf"
-      }
-    ]
-  },
-  {
     "slug": "pasar-yang-menolak-digusur",
     "rubrik": "kronik",
     "title": "Pasar yang Menolak Digusur Waktu",
