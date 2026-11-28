@@ -3,71 +3,30 @@
     "slug": "pasar-yang-menolak-digusur",
     "rubrik": "kronik",
     "title": "Pasar yang Menolak Digusur Waktu",
-    "sujudul": "Tiga generasi pedagang di Pasar Johar bertahan melawan arus pembangunan—dan menemukan bahwa ingatan punya harga.",
-    "dek": "Catatan dari Semarang, tempat kios-kios kayu tua masih menyimpan bau rempah dan perjanjian yang tak pernah ditulis.",
-    "author": "Nurul Hakim",
-    "authorRole": "Kontributor Kronik",
-    "date": "2026-11-18",
-    "reading": 12,
+    "sujudul": "",
+    "dek": "",
+    "author": "Tim Redaksi",
+    "authorRole": "Kontributor",
+    "date": "2026-11-28",
+    "reading": 5,
     "image": "/img/hero-kronik.jpg",
-    "imageAlt": "Bust marmer bernuansa klasik dengan kain emas, cahaya tunggal—ilustrasi sejarah yang membatu.",
+    "imageAlt": "Pasar yang Menolak Digusur Waktu",
     "imageCredit": "Ilustrasi: Arsip Swara Bestari",
-    "feature": true,
-    "tags": [
-      "Kota",
-      "Sejarah Lisan",
-      "Semarang"
-    ],
-    "excerpt": "Setiap pagi, sebelum matahari menyentuh atap seng, Pasar Johar bernapas. Napasnya bau bawang putih, minyak kelapa, dan air hujan yang menggenang di antara batu lantai.",
+    "feature": false,
+    "tags": [],
+    "excerpt": "Uji paragraf.",
     "body": [
       {
         "type": "p",
-        "text": "Setiap pagi, sebelum matahari menyentuh atap seng, Pasar Johar bernapas. Napasnya bau bawang putih, minyak kelapa, dan air hujan yang menggenang di antara batu lantai. Para pedagang datang lebih dulu daripada pembeli, karena kios bukan hanya tempat berjualan—ia adalah alamat ingatan."
-      },
-      {
-        "type": "p",
-        "text": "Haji Abdul Karim pertama kali membuka kiosnya pada 1962, tahun ketika Semarang masih menyimpan luka pascakemerdekaan di dinding-dinding gudang pelabuhan. Ia menjual kain batik dan rempah dalam satu ruang sempit berukuran tiga kali empat meter. Kios itu masih ada. Yang berjualan sekarang adalah cucunya, Mbak Mutia, empat puluh dua tahun, yang menyeka meja kayu itu dengan gerakan sama seperti kakeknya: dua putaran, lalu berhenti di sudut kanan depan."
-      },
-      {
-        "type": "quote",
-        "text": "Kios ini tidak menjual barang. Ia menjual janji bahwa orang masih bisa datang ke tempat yang sama selama lima puluh tahun.",
-        "by": "Mutia Rahmawati, pedagang generasi ketiga"
-      },
-      {
-        "type": "p",
-        "text": "Pada 2014, rencana revitalisasi membawa kabar yang selama ini hanya dibisikkan: bahwa pasar akan dibongkar, pedagang akan dipindahkan ke gedung baru dengan eskalator dan pendingin udara. Banyak yang menyetujui, karena lapisan lantai pasar memang sudah retak dan atapnya bocor setiap Februari. Tetapi bagi sebagian kecil pedagang, yang disebut “pindah” adalah bentuk lain dari “dihapus”."
+        "text": "Uji paragraf."
       },
       {
         "type": "h2",
-        "text": "Harga sebuah sudut"
+        "text": "Subjudul Uji"
       },
       {
         "type": "p",
-        "text": "Anthropolog Constance Classen pernah menulis bahwa penciuman adalah indra yang paling kuat mengikat seseorang pada masa lalu. Pasar Johar barangkali adalah contoh sempurna. Dari pintu utara, hidung akan disambut wangi kayu manis dan kapulaga. Empat belas langkah ke timur, ada wangi ikan sarden kalengan. Butuh delapan puluh tahun untuk membangun tata ruang aroma seperti ini—dan tiga bulan untuk membongkarnya."
-      },
-      {
-        "type": "p",
-        "text": "Ketika gedung baru akhirnya dibuka pada 2021, sebagian besar pedagang pindah. Mbak Mutia tetap di kios lamanya selama delapan belas bulan, sampai akhirnya menemukan kompromi: ia mengambil ruang di lantai dasar gedung baru, tetapi membawa serta pintu kayu asli dari kios kakeknya. Pintu itu tidak muat di dalam lift. Mereka harus menaikinya lewat tangga darurat, dengan empat orang mengangkat."
-      },
-      {
-        "type": "p",
-        "text": "Hari ini, jika Anda mendatangi lantai dasar Pasar Johar Baru, Anda akan melihat pintu kayu tua yang aneh di tengah deretan kios modern. Ada goresan nama-nama di kusennya, ditulis dengan pisau kecil oleh pedagang yang sudah meninggal. Mbak Mutia tidak pernah menghapusnya. “Ini bukan dekorasi,” katanya. “Ini Daftar Hadir.”"
-      },
-      {
-        "type": "p",
-        "text": "Dalam bahasa Jawa, papan nama bisa disebut tetenger—penanda. Tetapi kata itu juga berarti pengingat. Pasar, pada akhirnya, bukan dibangun dari semen. Ia dibangun dari orang-orang yang sepakat mengingat hal yang sama di tempat yang sama."
-      },
-      {
-        "type": "p",
-        "text": "Ketika ruang dibongkar, yang pertama hilang bukan bangunan, melainkan rute—jalan pintas yang hanya diketahui oleh mereka yang tinggal lama. Pembeli lama tahu harus masuk dari sisi mana pada jam berapa; pedagang tahu kapan harus menutup dagangan karena matahari akan menyengat. Rute-rute ini tidak pernah masuk dalam gambar arsitek."
-      },
-      {
-        "type": "h2",
-        "text": "Rute yang tidak masuk gambar"
-      },
-      {
-        "type": "p",
-        "text": "Mbak Mutia masih menyimpan peta mental itu. Ia bisa menyebutkan empat belas pintu masuk lama, tujuh di antaranya sekarang sudah menjadi dinding. \"Kalau ada yang tersesat,\" katanya, \"saya gambarkan di kertas struk.\""
+        "text": "Isi uji."
       }
     ]
   },
