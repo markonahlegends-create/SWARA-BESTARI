@@ -7,11 +7,14 @@
   "scripts": {
     "dev": "astro dev --host 0.0.0.0 --port 4321",
     "start": "astro dev --host 0.0.0.0 --port 4321",
-    "build": "npm run og && npm run pdf && astro build",
+    "build": "node scripts/periksa-data.mjs && npm run og && npm run pdf && astro build",
     "preview": "astro preview --host 0.0.0.0 --port 4321",
     "astro": "astro",
     "og": "node scripts/build-og.mjs",
-    "pdf": "node scripts/build-pdf.mjs"
+    "pdf": "node scripts/build-pdf.mjs",
+    "test": "node --experimental-strip-types scripts/uji/crud.mjs && node --experimental-strip-types scripts/uji/status.mjs && node scripts/uji/editor.mjs",
+    "test:beranda": "node scripts/uji/beranda.mjs",
+    "test:semua": "npm test && npm run test:beranda"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.3.1",
@@ -21,5 +24,8 @@
     "pdfkit": "^0.15.1",
     "sharp": "^0.34.4",
     "wawoff2": "^2.0.1"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.3"
   }
 }
