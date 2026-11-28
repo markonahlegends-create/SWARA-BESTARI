@@ -433,31 +433,42 @@ export async function ALL({ request }) {
         return json({ error: `Slug "${slug}" sudah dipakai.` }, 409);
       }
 
-      /* Rakit blok isi dari teks editor (pisahkan per baris kosong). */
+      /* Rakit blok isi. Dua bentuk diterima:
+         1. larik blok {type,text} dari editor visual (bentuk utama), dan
+         2. teks bertanda "## " / "> " (klien lama atau API langsung).
+         Keduanya dinormalkan ke struktur yang sama. */
       const blocks = [];
-      const raw = String(input.body || '');
-      for (const chunk of raw.split(/\n{2,}/)) {
-        const t = chunk.trim();
-        if (!t) continue;
-        if (t.startsWith('## ')) blocks.push({ type: 'h2', text: t.slice(3).trim() });
-        else if (t.startsWith('> '))
-          blocks.push({ type: 'quote', text: t.slice(2).trim(), by: cleanText(input.author) });
+      const judulPenulis = cleanText(input.author);
+
+      const pushBlok = (type, text) => {
+        const t = String(text || '').trim();
+        if (!t) return;
+        if (type === 'h2') blocks.push({ type: 'h2', text: t.replace(/^#+\s*/, '') });
+        else if (type === 'quote')
+          blocks.push({ type: 'quote', text: t.replace(/^>\s*/, ''), by: judulPenulis });
         else blocks.push({ type: 'p', text: t.replace(/\n/g, ' ') });
+      };
+
+      if (Array.isArray(input.body)) {
+        for (const b of input.body) {
+          if (!b || typeof b !== 'object') continue;
+          pushBlok(String(b.type || 'p'), b.text);
+        }
+      } else {
+        for (const chunk of String(input.body || '').split(/\n{2,}/)) {
+          const t = chunk.trim();
+          if (!t) continue;
+          if (t.startsWith('## ')) pushBlok('h2', t.slice(3));
+          else if (t.startsWith('> ')) pushBlok('quote', t.slice(2));
+          else pushBlok('p', t);
+        }
       }
-      /* Subjudul wajib HANYA untuk artikel baru. Versi lama mewajibkannya
-         juga saat mengubah artikel, sehingga perbaikan kecil (mis. salah
-         ketik judul) ditolak dengan pesan yang membingungkan. */
-      const sedangMengubah = articles.some((a) => a.slug === input.originalSlug);
-      if (!sedangMengubah && blocks.length && !blocks.some((b) => b.type === 'h2')) {
-        return json(
-          {
-            error:
-              'Tambahkan minimal satu subjudul: tulis satu baris yang diawali ' +
-              '“## ” (dua pagar lalu spasi). Contoh: “## Sejarah Pasar Johar”.',
-          },
-          400
-        );
-      }
+      /* Subjudul tidak lagi diwajibkan. Dulu artikel baru ditolak bila tidak
+         memuat satu pun baris berawalan “## ”, padahal penulis awam tidak
+         tahu sintaks itu — dan karena form lama berupa satu kotak teks
+         mentah, satu salah ketik saja sudah menggagalkan penyimpanan.
+         Sekarang editor menyusun blok secara visual, jadi syarat ini
+         dihapus seluruhnya; artikel tanpa subjudul tetap sah. */
 
       const body = {
         slug,

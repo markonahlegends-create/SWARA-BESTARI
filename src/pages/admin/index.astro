@@ -199,6 +199,20 @@ const SITE = 'Swara Bestari';
 
           <div class="panel">
             <div class="panel__h">
+              <h2 class="panel__t">Isi iklan (tayang di situs)</h2>
+              <span class="panel__meta">Gambar + tautan pemasang</span>
+            </div>
+            <p class="note note--panel">
+              Selama sebuah slot <strong>kosong</strong>, pengunjung melihat kotak
+              “Tersedia — pasang iklan Anda di sini”. Begitu Anda mengisi gambar dan
+              tautannya lalu mengaktifkannya, slot itu berganti menjadi iklan
+              pemasang di seluruh halaman yang memakainya.
+            </p>
+            <div class="adfill" id="adfill-rows"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__h">
               <h2 class="panel__t">Slot iklan</h2>
               <span class="panel__meta">Tarif &amp; catatan per slot</span>
             </div>
@@ -357,7 +371,7 @@ const SITE = 'Swara Bestari';
           </label>
 
           <label class="fld">
-            <span class="fld__label">Subjudul</span>
+            <span class="fld__label">Anak judul <span class="fld__hint">opsional, tampil di bawah judul</span></span>
             <input class="inp" id="f-sujudul" />
           </label>
 
@@ -399,13 +413,24 @@ const SITE = 'Swara Bestari';
             <input class="inp" id="f-imageAlt" />
           </label>
 
-          <label class="fld">
+          <div class="fld">
             <span class="fld__label">
               Isi tulisan
-              <span class="fld__hint">awali baris dengan “## ” untuk subjudul, “&gt; ” untuk kutipan. Pisahkan paragraf dengan satu baris kosong.</span>
+              <span class="fld__hint">Tulis biasa saja — tidak perlu tanda apa pun.</span>
             </span>
-            <textarea class="inp inp--area inp--mono" rows="22" id="f-body"></textarea>
-          </label>
+
+            <div class="beditor">
+              <div class="beditor__list" id="bed-blocks"></div>
+              <div class="beditor__add">
+                <button type="button" class="btn btn--ghost" data-bed-add="p">+ Paragraf</button>
+                <button type="button" class="btn btn--ghost" data-bed-add="h2">+ Subjudul</button>
+                <button type="button" class="btn btn--ghost" data-bed-add="quote">+ Kutipan</button>
+              </div>
+              <p class="fld__hint">
+                Tekan Enter dua kali di dalam paragraf untuk memecahnya menjadi dua paragraf.
+              </p>
+            </div>
+          </div>
 
           <label class="fld fld--check">
             <input type="checkbox" id="f-feature" />
@@ -425,6 +450,7 @@ const SITE = 'Swara Bestari';
     </div>
 
     <!-- ═══════════ PEMBERITAHUAN ═══════════ -->
+    <input type="file" id="ad-upload-input" accept="image/*" hidden />
     <div class="toast" id="toast" hidden></div>
 
     <style>
@@ -565,6 +591,7 @@ const SITE = 'Swara Bestari';
       }
       .side__nav { display: flex; flex-direction: column; gap: 2px; padding: 1rem 0.7rem; flex: 1; }
       /* Petunjuk singkat di atas daftar panel — menjawab "ubah di mana?". */
+      .note--panel { margin: 0.9rem 1rem 0; }
       .note {
         margin: 0 0 1.25rem;
         padding: 0.85rem 1rem;
@@ -876,6 +903,123 @@ const SITE = 'Swara Bestari';
       .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.9rem; }
       .imgrow { display: flex; gap: 0.5rem; }
       .imgrow .inp { flex: 1; }
+      .btn--sm { padding: 0.5rem 0.8rem; font-size: 0.78rem; white-space: nowrap; }
+
+      /* ── Editor blok isi tulisan ── */
+      .beditor { display: grid; gap: 0.7rem; }
+      .beditor__list { display: grid; gap: 0.6rem; }
+      .beditor__add { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+      .bed {
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        background: #fff;
+        overflow: hidden;
+      }
+      .bed[data-type='h2'] { border-left: 3px solid var(--gold); background: #fdfbf6; }
+      .bed[data-type='quote'] { border-left: 3px solid var(--ink-soft); }
+      .bed__bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.25rem 0.4rem 0.25rem 0.6rem;
+        background: #faf7f0;
+        border-bottom: 1px solid var(--line);
+      }
+      .bed[data-type='h2'] .bed__bar { background: #f8f1e0; }
+      .bed__tag {
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        font-weight: 600;
+      }
+      .bed__acts { display: flex; gap: 0.15rem; }
+      .bed__act {
+        width: 24px;
+        height: 22px;
+        display: grid;
+        place-items: center;
+        border: 1px solid transparent;
+        background: transparent;
+        border-radius: 2px;
+        color: var(--ink-soft);
+        font-size: 0.72rem;
+        cursor: pointer;
+        line-height: 1;
+      }
+      .bed__act:hover:not(:disabled) { background: #fff; border-color: var(--line); color: var(--ink); }
+      .bed__act:disabled { opacity: 0.28; cursor: default; }
+      .bed__act--del:hover:not(:disabled) { color: #a1261d; border-color: #e6c3bf; background: #fdf2f0; }
+      .bed__inp {
+        border: 0;
+        border-radius: 0;
+        padding: 0.6rem 0.7rem;
+        width: 100%;
+        resize: vertical;
+        min-height: 2.2rem;
+      }
+      .bed[data-type='h2'] .bed__inp { font-weight: 600; font-size: 1rem; }
+      .bed[data-type='quote'] .bed__inp { font-style: italic; }
+      .bed__inp:focus { outline: none; box-shadow: inset 0 0 0 2px rgba(160, 120, 40, 0.15); }
+      .bed__empty {
+        margin: 0;
+        padding: 1.2rem;
+        text-align: center;
+        color: var(--ink-soft);
+        font-size: 0.83rem;
+        border: 1px dashed var(--line);
+        border-radius: 3px;
+        background: #fbf9f4;
+      }
+
+      /* ── Kartu "Isi iklan": satu slot, satu kartu ── */
+      .adfill { display: grid; gap: 1rem; padding: 0.75rem 1rem 1rem; }
+      .adcard { border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: #fff; }
+      .adcard__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.7rem 1rem;
+        background: #faf7f0;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .adcard__name { display: block; font-weight: 600; font-size: 0.9rem; }
+      .adcard__size { display: block; color: var(--ink-soft); font-size: 0.76rem; letter-spacing: 0.04em; }
+      .adcard__switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+        user-select: none;
+      }
+      .adcard__switch input { width: 16px; height: 16px; accent-color: var(--gold); cursor: pointer; }
+      .adcard__grid {
+        display: grid;
+        grid-template-columns: 190px 1fr;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      .adcard__preview {
+        display: grid;
+        place-items: center;
+        border: 1px dashed var(--line);
+        border-radius: 3px;
+        background: #fbf9f4;
+        min-height: 96px;
+        padding: 0.5rem;
+        color: var(--ink-soft);
+        font-size: 0.75rem;
+        text-align: center;
+      }
+      .adcard__preview img { max-width: 100%; max-height: 130px; object-fit: contain; display: block; }
+      .adcard__fields { display: grid; gap: 0.8rem; align-content: start; }
+      @media (max-width: 720px) {
+        .adcard__grid { grid-template-columns: 1fr; }
+      }
       .imgprev {
         display: none;
         margin-top: 0.6rem;
@@ -1379,14 +1523,137 @@ const SITE = 'Swara Bestari';
         ).join('');
       }
 
-      const bodyToText = (body = []) =>
-        body
+      /* ═══════════════════════════════════════════════════════════
+         Editor blok — pengganti ketikan "## " / "> ".
+         Admin hanya melihat kotak teks biasa dengan label yang jelas;
+         di balik layar blok-blok ini diubah kembali menjadi teks
+         bertanda ("## ", "> ") saat disimpan, sehingga format berkas
+         artikel lama tidak berubah sama sekali.
+         ═══════════════════════════════════════════════════════════ */
+      const bedState = { blocks: [] };
+
+      const PARAGRAF_KOSONG = '<p class="bed__empty">Belum ada isi. Klik “+ Paragraf” untuk mulai menulis.</p>';
+
+      function bedRender() {
+        const list = $('#bed-blocks');
+        if (!bedState.blocks.length) {
+          list.innerHTML = PARAGRAF_KOSONG;
+          return;
+        }
+        list.innerHTML = bedState.blocks
+          .map(
+            (b, i) => `
+          <div class="bed" data-bed="${i}" data-type="${b.type}">
+            <div class="bed__bar">
+              <span class="bed__tag">${
+                b.type === 'h2' ? 'Subjudul' : b.type === 'quote' ? 'Kutipan' : 'Paragraf'
+              }</span>
+              <div class="bed__acts">
+                <button type="button" class="bed__act" data-bed-up="${i}" title="Pindah ke atas" ${
+                  i === 0 ? 'disabled' : ''
+                }>↑</button>
+                <button type="button" class="bed__act" data-bed-down="${i}" title="Pindah ke bawah" ${
+                  i === bedState.blocks.length - 1 ? 'disabled' : ''
+                }>↓</button>
+                <button type="button" class="bed__act bed__act--del" data-bed-del="${i}" title="Hapus">✕</button>
+              </div>
+            </div>
+            <textarea class="inp inp--area bed__inp" rows="${
+              b.type === 'p' ? 4 : b.type === 'h2' ? 1 : 2
+            }" data-bed-text="${i}" placeholder="${
+              b.type === 'h2' ? 'Tulis subjudul…' : b.type === 'quote' ? 'Tulis kutipan…' : 'Tulis paragraf…'
+            }"></textarea>
+          </div>`
+          )
+          .join('');
+
+        // Isi nilai setelah dipasang agar Enter/newline tidak hilang.
+        bedState.blocks.forEach((b, i) => {
+          const el = list.querySelector(`[data-bed-text="${i}"]`);
+          if (el) el.value = b.text;
+        });
+      }
+
+      /** Teks bertanda atau larik blok → daftar blok (dipakai saat membuka artikel). */
+      function bedFromText(input = '') {
+        // Artikel lama sudah tersimpan sebagai larik {type,text} — pakai apa adanya.
+        if (Array.isArray(input)) {
+          return input
+            .filter((b) => b && String(b.text || '').trim())
+            .map((b) => ({ type: b.type === 'h2' || b.type === 'quote' ? b.type : 'p', text: String(b.text) }));
+        }
+        const blocks = [];
+        String(input)
+          .replace(/\r\n/g, '\n')
+          .split(/\n\s*\n/)
+          .forEach((chunk) => {
+            const t = chunk.trim();
+            if (!t) return;
+            if (t.startsWith('## ')) blocks.push({ type: 'h2', text: t.slice(3).trim() });
+            else if (t.startsWith('> ')) blocks.push({ type: 'quote', text: t.slice(2).trim() });
+            else blocks.push({ type: 'p', text: t });
+          });
+        return blocks;
+      }
+
+      /** Daftar blok → teks bertanda (dipakai saat menyimpan). */
+      function bedToText() {
+        return bedState.blocks
           .map((b) => {
-            if (b.type === 'h2') return `## ${b.text}`;
-            if (b.type === 'quote') return `> ${b.text}`;
-            return b.text;
+            const t = b.text.trim();
+            if (!t) return '';
+            if (b.type === 'h2') return `## ${t.replace(/^#+\s*/, '')}`;
+            if (b.type === 'quote') return `> ${t.replace(/^>\s*/, '')}`;
+            return t;
           })
+          .filter(Boolean)
           .join('\n\n');
+      }
+
+      function bedSetFromText(text) {
+        bedState.blocks = bedFromText(text);
+        // Artikel baru tanpa isi: sediakan satu paragraf kosong agar siap ketik.
+        if (!bedState.blocks.length) bedState.blocks.push({ type: 'p', text: '' });
+        bedRender();
+      }
+
+      // Simpan ketikan ke state (input, tanpa render ulang → kursor tidak melompat).
+      document.addEventListener('input', (e) => {
+        const el = e.target.closest('[data-bed-text]');
+        if (!el) return;
+        const i = Number(el.dataset.bedText);
+        if (bedState.blocks[i]) bedState.blocks[i].text = el.value;
+      });
+
+      document.addEventListener('click', (e) => {
+        const add = e.target.closest('[data-bed-add]');
+        if (add) {
+          bedState.blocks.push({ type: add.dataset.bedAdd, text: '' });
+          bedRender();
+          const inputs = document.querySelectorAll('#bed-blocks [data-bed-text]');
+          inputs[inputs.length - 1]?.focus();
+          return;
+        }
+        const del = e.target.closest('[data-bed-del]');
+        if (del) {
+          bedState.blocks.splice(Number(del.dataset.bedDel), 1);
+          bedRender();
+          return;
+        }
+        const up = e.target.closest('[data-bed-up]');
+        if (up) {
+          const i = Number(up.dataset.bedUp);
+          [bedState.blocks[i - 1], bedState.blocks[i]] = [bedState.blocks[i], bedState.blocks[i - 1]];
+          bedRender();
+          return;
+        }
+        const down = e.target.closest('[data-bed-down]');
+        if (down) {
+          const i = Number(down.dataset.bedDown);
+          [bedState.blocks[i + 1], bedState.blocks[i]] = [bedState.blocks[i], bedState.blocks[i + 1]];
+          bedRender();
+        }
+      });
 
       function openEditor(a) {
         const isNew = !a;
@@ -1405,7 +1672,7 @@ const SITE = 'Swara Bestari';
           tags: (a?.tags || []).join(', '),
           image: a?.image || IMAGES[0][0],
           imageAlt: a?.imageAlt || '',
-          body: a ? bodyToText(a.body) : '',
+          body: a?.body || [],
           feature: Boolean(a?.feature),
           originalSlug: a?.slug || '',
         };
@@ -1422,18 +1689,27 @@ const SITE = 'Swara Bestari';
         $('#f-tags').value = f.tags;
         $('#f-image').value = f.image;
         $('#f-imageAlt').value = f.imageAlt;
-        $('#f-body').value = f.body;
+        bedSetFromText(f.body);
         $('#f-feature').checked = f.feature;
         $('#f-original-slug').value = f.originalSlug;
         $('#drawer-err').hidden = true;
 
-        // Unikkan pilihan gambar bila artikel memakai gambar lain.
-        if (a && !IMAGES.some(([v]) => v === a.image)) {
-          $('#f-image').insertAdjacentHTML(
-            'afterbegin',
-            `<option value="${esc(a.image)}">${esc(a.image)} (khusus artikel ini)</option>`
-          );
-          $('#f-image').value = a.image;
+        // Tambahkan pilihan gambar khusus artikel — SEKALI saja.
+        // Versi lama selalu menyisipkan opsi baru setiap kali editor dibuka,
+        // sehingga membuka-tutup artikel berkali-kali menumpuk duplikat yang
+        // sama di daftar (10 → 13 opsi setelah tiga kali buka).
+        // Pakai f.image (sudah dinormalkan), bukan a.image. Artikel lama tanpa
+        // bidang `image` membuat a.image = undefined, dan versi sebelumnya
+        // menambahkan opsi bernilai "undefined" pada setiap kali dibuka.
+        if (f.image && !IMAGES.some(([v]) => v === f.image)) {
+          const select = $('#f-image');
+          const nilai = f.image;
+          let opsi = [...select.options].find((o) => o.value === nilai);
+          if (!opsi) {
+            opsi = new Option(`${nilai} (khusus artikel ini)`, nilai);
+            select.add(opsi, 0);
+          }
+          select.value = nilai;
         }
 
         previewImage(f.image);
@@ -1486,6 +1762,14 @@ const SITE = 'Swara Bestari';
         btn.textContent = 'Menyimpan…';
         err.hidden = true;
 
+        if (!bedToText().trim()) {
+          err.textContent = 'Isi tulisan masih kosong. Klik “+ Paragraf” lalu tulis isi artikel.';
+          err.hidden = false;
+          btn.disabled = false;
+          btn.textContent = 'Simpan';
+          return;
+        }
+
         const payload = {
           originalSlug: $('#f-original-slug').value,
           title: $('#f-title').value,
@@ -1500,7 +1784,10 @@ const SITE = 'Swara Bestari';
           tags: $('#f-tags').value,
           image: $('#f-image').value,
           imageAlt: $('#f-imageAlt').value,
-          body: $('#f-body').value,
+          body: bedState.blocks
+            .filter((b) => b.text.trim())
+            .map((b) => ({ type: b.type, text: b.text.trim() })),
+          bodyText: bedToText(),
           feature: $('#f-feature').checked,
         };
 
@@ -1613,6 +1900,62 @@ const SITE = 'Swara Bestari';
           )
           .join('');
 
+        /* Panel "Isi iklan": satu kartu per slot, dengan ukuran yang
+           disarankan supaya admin tidak perlu menebak dimensi. */
+        $('#adfill-rows').innerHTML = Object.entries(state.ads.adSlots || {})
+          .map(([key, s]) => {
+            const aktif = Boolean(s.active && String(s.image || '').trim());
+            return `
+          <div class="adcard" data-slot-card="${key}">
+            <div class="adcard__head">
+              <div>
+                <span class="adcard__name">${esc(s.label || key)}</span>
+                <span class="adcard__size">${esc(s.size || '')} px</span>
+              </div>
+              <label class="adcard__switch">
+                <input type="checkbox" data-ad-active="${key}" ${aktif ? 'checked' : ''} />
+                <span>${aktif ? 'Tayang' : 'Kosong'}</span>
+              </label>
+            </div>
+
+            <div class="adcard__grid">
+              <div class="adcard__preview">
+                ${s.image
+                  ? `<img src="${esc(s.image)}" alt="" />`
+                  : '<span>Belum ada gambar</span>'}
+              </div>
+
+              <div class="adcard__fields">
+                <label class="fld">
+                  <span class="fld__label">Gambar iklan</span>
+                  <div class="imgrow">
+                    <input class="inp" data-ad-image="${key}" value="${esc(s.image || '')}" placeholder="/img/iklan-nama.jpg" />
+                    <button type="button" class="btn btn--ghost btn--sm" data-ad-upload="${key}">Unggah…</button>
+                  </div>
+                  <p class="fld__hint">Ukuran disarankan ${esc(s.size || '')} px. Logo & teks harus terbaca di layar ponsel.</p>
+                </label>
+
+                <label class="fld">
+                  <span class="fld__label">Tautan tujuan <span class="fld__hint">https://…</span></span>
+                  <input class="inp" data-ad-href="${key}" value="${esc(s.href || '')}" placeholder="https://contoh.com/promo" />
+                </label>
+
+                <div class="row3">
+                  <label class="fld">
+                    <span class="fld__label">Nama pemasang</span>
+                    <input class="inp" data-ad-brand="${key}" value="${esc(s.brand || '')}" placeholder="Nama merek" />
+                  </label>
+                  <label class="fld" style="grid-column:span 2">
+                    <span class="fld__label">Kalimat iklan <span class="fld__hint">tampil di bawah gambar</span></span>
+                    <input class="inp" data-ad-headline="${key}" value="${esc(s.headline || '')}" placeholder="Promo akhir tahun" />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>`;
+          })
+          .join('');
+
         $('#fmt-rows').innerHTML = (state.ads.adFormats || [])
           .map(
             (f, i) => `
@@ -1655,6 +1998,33 @@ const SITE = 'Swara Bestari';
           if (ads.adFormats[i]) ads.adFormats[i][el.dataset.field] = el.value;
         });
 
+        // Panel "Isi iklan" — satu slot per kartu.
+        $$('[data-slot-card]').forEach((kartu) => {
+          const key = kartu.dataset.slotCard;
+          const slot = ads.adSlots[key];
+          if (!slot) return;
+          slot.image = kartu.querySelector(`[data-ad-image="${key}"]`)?.value.trim() || '';
+          slot.href = kartu.querySelector(`[data-ad-href="${key}"]`)?.value.trim() || '';
+          slot.brand = kartu.querySelector(`[data-ad-brand="${key}"]`)?.value.trim() || '';
+          slot.headline = kartu.querySelector(`[data-ad-headline="${key}"]`)?.value.trim() || '';
+          const aktifBox = kartu.querySelector(`[data-ad-active="${key}"]`);
+          slot.active = Boolean(aktifBox?.checked);
+        });
+
+        // Tolak slot yang sudah diaktifkan tetapi belum lengkap — lebih baik
+        // memberi tahu sekarang daripada menayangkan kotak "Tersedia" tanpa sebab.
+        const tidakLengkap = Object.entries(ads.adSlots).filter(
+          ([, s]) => s.active && (!String(s.image || '').trim() || !String(s.href || '').trim())
+        );
+        if (tidakLengkap.length) {
+          toast(
+            `Slot ${tidakLengkap.map(([k]) => k).join(', ')} aktif tetapi gambar/tautannya kosong. ` +
+              `Lengkapi dulu, atau matikan sakelarnya.`,
+            true
+          );
+          return;
+        }
+
         const btn = $('#save-ads-btn');
         btn.disabled = true;
         try {
@@ -1665,6 +2035,52 @@ const SITE = 'Swara Bestari';
           toast(e.message, true);
         } finally {
           btn.disabled = false;
+        }
+      });
+
+      /* ══ Unggah gambar iklan dari kartu slot ══ */
+      let slotUnggah = '';
+      document.addEventListener('click', (e) => {
+        const t = e.target.closest('[data-ad-upload]');
+        if (!t) return;
+        slotUnggah = t.dataset.adUpload;
+        $('#ad-upload-input').click();
+      });
+
+      $('#ad-upload-input').addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        const key = slotUnggah;
+        e.target.value = '';
+        if (!file || !key) return;
+
+        const kartu = document.querySelector(`[data-slot-card="${key}"]`);
+        const tombol = kartu?.querySelector('[data-ad-upload]');
+        if (tombol) { tombol.disabled = true; tombol.textContent = 'Mengunggah…'; }
+
+        try {
+          const dataUrl = await new Promise((res, rej) => {
+            const r = new FileReader();
+            r.onload = () => res(r.result);
+            r.onerror = rej;
+            r.readAsDataURL(file);
+          });
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: `iklan-${key}-${file.name}`, dataUrl }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Unggah gagal.');
+
+          kartu.querySelector(`[data-ad-image="${key}"]`).value = data.path;
+          const prev = kartu.querySelector('.adcard__preview');
+          if (prev) prev.innerHTML = `<img src="${data.path}" alt="" />`;
+          toast(`Gambar iklan terunggah (${Math.round(data.bytes / 1024)} KB). Klik “Simpan perubahan”.`);
+        } catch (ex) {
+          toast(ex.message, true);
+        } finally {
+          if (tombol) { tombol.disabled = false; tombol.textContent = 'Unggah…'; }
         }
       });
 
