@@ -6,7 +6,13 @@
       "size": "970 × 250",
       "rate": "Rp 1.000.000 / bulan",
       "note": "Slot premium, di atas lipatan. Impresi tertinggi di seluruh situs.",
-      "slot": "sb-billboard-top"
+      "slot": "sb-billboard-top",
+      "active": false,
+      "image": "",
+      "href": "",
+      "brand": "",
+      "headline": "",
+      "label": "Billboard atas (beranda)"
     },
     "leaderboard": {
       "id": "leaderboard",
@@ -14,7 +20,13 @@
       "size": "728 × 90",
       "rate": "Rp 700.000 / bulan",
       "note": "Letak selebar kolom isi, di antara dua blok artikel.",
-      "slot": "sb-leaderboard-mid"
+      "slot": "sb-leaderboard-mid",
+      "active": false,
+      "image": "",
+      "href": "",
+      "brand": "",
+      "headline": "",
+      "label": "Leaderboard artikel"
     },
     "halfpage": {
       "id": "halfpage",
@@ -22,7 +34,13 @@
       "size": "300 × 600",
       "rate": "Rp 500.000 / bulan",
       "note": "Sticky sidebar desktop. CTR tertinggi setelah billboard.",
-      "slot": "sb-halfpage-rail"
+      "slot": "sb-halfpage-rail",
+      "active": false,
+      "image": "",
+      "href": "",
+      "brand": "",
+      "headline": "",
+      "label": "Half page samping"
     },
     "square": {
       "id": "square",
@@ -30,7 +48,13 @@
       "size": "300 × 250",
       "rate": "Rp 400.000 / bulan",
       "note": "Modular, tersedia di sidebar dan dalam artikel.",
-      "slot": "sb-square-1"
+      "slot": "sb-square-1",
+      "active": false,
+      "image": "",
+      "href": "",
+      "brand": "",
+      "headline": "",
+      "label": "Kotak dalam artikel"
     },
     "strip": {
       "id": "strip",
@@ -38,7 +62,13 @@
       "size": "970 × 90",
       "rate": "Rp 300.000 / bulan",
       "note": "Bilah horizontal sebelum footer, kontinuitas dengan billboard.",
-      "slot": "sb-strip-footer"
+      "slot": "sb-strip-footer",
+      "active": false,
+      "image": "",
+      "href": "",
+      "brand": "",
+      "headline": "",
+      "label": "Strip bawah judul"
     },
     "skyscraper": {
       "id": "skyscraper",
@@ -46,7 +76,13 @@
       "size": "160 × 600",
       "rate": "Rp 300.000 / bulan",
       "note": "Menara sempit di sisi kanan halaman artikel.",
-      "slot": "sb-skyscraper-article"
+      "slot": "sb-skyscraper-article",
+      "active": false,
+      "image": "",
+      "href": "",
+      "brand": "",
+      "headline": "",
+      "label": "Skyscraper kolom samping"
     },
     "native": {
       "id": "native",
@@ -54,7 +90,13 @@
       "size": "Native / 100% width",
       "rate": "Rp 2.500.000 / mata surat",
       "note": "Ditulis oleh tim redaksi, disetujui mitra. Berlabel “Mata Surat”.",
-      "slot": "sb-native-feed"
+      "slot": "sb-native-feed",
+      "active": false,
+      "image": "",
+      "href": "",
+      "brand": "",
+      "headline": "",
+      "label": "Native “Mata Surat”"
     },
     "compact": {
       "id": "compact",
@@ -62,7 +104,13 @@
       "size": "320 × 220",
       "rate": "Rp1.000.000 / bulan",
       "note": "Kartu di dalam grid kanal, menyatu dengan tata letak editorial.",
-      "slot": "sb-compact-grid"
+      "slot": "sb-compact-grid",
+      "active": false,
+      "image": "",
+      "href": "",
+      "brand": "",
+      "headline": "",
+      "label": "Compact dalam daftar"
     }
   },
   "adPackages": [

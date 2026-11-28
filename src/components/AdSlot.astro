@@ -3,6 +3,8 @@
  * AdSlot — slot iklan fleksibel dengan placeholder "tersedia".
  * Untuk iklan asli: kirim prop `image`, `href`, `brand`, `headline`.
  */
+import { adSlots } from '../data/ads.js';
+
 interface Props {
   format?: 'billboard' | 'leaderboard' | 'halfpage' | 'square' | 'strip' | 'skyscraper' | 'compact' | 'native';
   label?: string;
@@ -17,13 +19,29 @@ interface Props {
 const {
   format = 'square',
   label = 'Ruang Iklan',
-  image,
-  href,
-  brand,
-  headline,
+  image: imageProp,
+  href: hrefProp,
+  brand: brandProp,
+  headline: headlineProp,
   tone = 'light',
   class: className = '',
 } = Astro.props;
+
+/**
+ * Iklan asli diisi admin lewat dashboard (ads.json → adSlots).
+ * Prop individual menang atas data, sehingga pemanggilan langsung tetap
+ * bisa memaksa satu iklan tertentu. Slot dianggap TERISI hanya bila
+ * `active`, `image`, dan `href` semuanya terisi — bila salah satu kosong,
+ * pengunjung melihat placeholder "Tersedia", bukan tautan rusak.
+ */
+const slot = (adSlots as Record<string, any>)?.[format] || {};
+const aktif = Boolean(
+  slot.active && String(slot.image || '').trim() && String(slot.href || '').trim()
+);
+const image = imageProp ?? (aktif ? String(slot.image).trim() : undefined);
+const href = hrefProp ?? (aktif ? String(slot.href).trim() : undefined);
+const brand = brandProp ?? (aktif ? String(slot.brand || '').trim() : undefined);
+const headline = headlineProp ?? (aktif ? String(slot.headline || '').trim() : undefined);
 
 const sizes = {
   billboard: '970 × 250',
@@ -52,7 +70,12 @@ const imgH = (src: string) => IMG_SIZES[String(src).split('/').pop() || '']?.[1]
   </div>
 
   {image ? (
-    <a class="ad__creative" href={href ?? '#'} rel="sponsored noopener">
+    <a
+      class="ad__creative"
+      href={href}
+      rel="sponsored noopener"
+      target={/^https?:\/\//i.test(String(href)) ? '_blank' : undefined}
+    >
       <img src={image} alt={headline ?? brand ?? 'Iklan'} loading="lazy" /
             width={imgW(image)}
             height={imgH(image)}
