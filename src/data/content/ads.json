@@ -139,47 +139,56 @@
     {
       "name": "Billboard",
       "size": "970 × 250",
-      "placement": "Bawah masthead beranda"
+      "placement": "Bawah masthead beranda",
+      "rate": "Rp 1.000.000 / bulan"
     },
     {
       "name": "Leaderboard",
       "size": "728 × 90",
-      "placement": "Di antara blok artikel"
+      "placement": "Di antara blok artikel",
+      "rate": "Rp 700.000 / bulan"
     },
     {
       "name": "Half Page",
       "size": "300 × 600",
-      "placement": "Sidebar sticky"
+      "placement": "Sidebar sticky",
+      "rate": "Rp 650.000 / bulan"
     },
     {
       "name": "Square",
       "size": "300 × 250",
-      "placement": "Sidebar & dalam artikel"
+      "placement": "Sidebar & dalam artikel",
+      "rate": "Rp 450.000 / bulan"
     },
     {
       "name": "Strip",
       "size": "970 × 90",
-      "placement": "Sebelum footer"
+      "placement": "Sebelum footer",
+      "rate": "Rp 400.000 / bulan"
     },
     {
       "name": "Skyscraper",
       "size": "160 × 600",
-      "placement": "Halaman artikel"
+      "placement": "Halaman artikel",
+      "rate": "Rp 500.000 / bulan"
     },
     {
       "name": "Native",
       "size": "Mata Surat",
-      "placement": "Feed editorial"
+      "placement": "Feed editorial",
+      "rate": "Rp 1.750.000 / bulan"
     },
     {
       "name": "Compact Card",
       "size": "320 × 220",
-      "placement": "Grid kanal"
+      "placement": "Grid kanal",
+      "rate": "Rp 300.000 / bulan"
     },
     {
       "name": "Newsletter",
       "size": "600 × 200",
-      "placement": "Surat Swara (email)"
+      "placement": "Surat Swara (email)",
+      "rate": "Rp 850.000 / bulan"
     }
   ]
 }

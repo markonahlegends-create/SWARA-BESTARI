@@ -126,7 +126,8 @@ async function readFile(file) {
         `Periksa koneksi server dan izin GITHUB_TOKEN.`
     );
   }
-  if (res.status === 404) return { data: null, sha: null };
+  /* 404 dibedakan setelah 401/403: repositori yang tidak terlihat oleh
+     token juga menjawab 404, dan pesannya harus menyebutkan itu. */
   if (res.status === 401) {
     throw new Error(
       `GitHub tidak mengenali GITHUB_TOKEN (401). Token salah salin, ` +
@@ -143,9 +144,19 @@ async function readFile(file) {
     );
   }
   if (res.status === 404) {
+    /* Berkas baru memang belum ada — itu bukan kesalahan.
+       Bedakan dengan memeriksa apakah repositorinya sendiri terbaca. */
+    let repoTerbaca = false;
+    try {
+      const r = await fetch(`https://api.github.com/repos/${REPO}`, { headers: ghHeaders() });
+      repoTerbaca = r.ok;
+    } catch {
+      repoTerbaca = false;
+    }
+    if (repoTerbaca) return { data: null, sha: null }; // berkas belum ada
     throw new Error(
-      `Repositori atau berkas tidak ditemukan (404). Periksa GITHUB_REPO ` +
-        `dan GITHUB_BRANCH, atau pastikan token punya akses ke ${REPO}.`
+      `Repositori ${REPO} tidak bisa diakses dengan GITHUB_TOKEN (404). ` +
+        `Pastikan token punya izin Contents: Read and write pada repositori itu.`
     );
   }
   if (!res.ok) throw new Error(`GitHub baca ${file}: ${res.status} ${await res.text()}`);
@@ -176,7 +187,15 @@ async function writeFile(file, data, message, shaOverride) {
 async function triggerBuild() {
   const token = process.env.VERCEL_TOKEN;
   const project = process.env.VERCEL_PROJECT_ID;
-  if (!token || !project) return { triggered: false, reason: 'token belum diisi' };
+  if (!token || !project) {
+    return {
+      triggered: false,
+      reason:
+        'VERCEL_TOKEN / VERCEL_PROJECT_ID belum diisi. Perubahan tetap masuk ke ' +
+        'repositori, jadi situs akan dibangun ulang oleh Vercel sendiri setelah ' +
+        'commit terdeteksi — biasanya 1–2 menit.',
+    };
+  }
 
   const qs = new URLSearchParams({ forceNewBuild: '1' });
   if (process.env.VERCEL_TEAM_ID) qs.set('teamId', process.env.VERCEL_TEAM_ID);
@@ -425,9 +444,17 @@ export async function ALL({ request }) {
           blocks.push({ type: 'quote', text: t.slice(2).trim(), by: cleanText(input.author) });
         else blocks.push({ type: 'p', text: t.replace(/\n/g, ' ') });
       }
-      if (!blocks.some((b) => b.type === 'h2')) {
+      /* Subjudul wajib HANYA untuk artikel baru. Versi lama mewajibkannya
+         juga saat mengubah artikel, sehingga perbaikan kecil (mis. salah
+         ketik judul) ditolak dengan pesan yang membingungkan. */
+      const sedangMengubah = articles.some((a) => a.slug === input.originalSlug);
+      if (!sedangMengubah && blocks.length && !blocks.some((b) => b.type === 'h2')) {
         return json(
-          { error: 'Tambahkan minimal satu subjudul (awali baris dengan "## ").' },
+          {
+            error:
+              'Tambahkan minimal satu subjudul: tulis satu baris yang diawali ' +
+              '“## ” (dua pagar lalu spasi). Contoh: “## Sejarah Pasar Johar”.',
+          },
           400
         );
       }

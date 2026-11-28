@@ -16,7 +16,20 @@
  * ─────────────────────────────────────────────────────────────
  */
 import crypto from 'node:crypto';
-import sharp from 'sharp';
+
+/**
+ * sharp dimuat secara dinamis. Pustaka ini bergantung pada biner libvips
+ * yang bisa gagal dimuat di lingkungan serverless tertentu. Versi lama
+ * memakai `import sharp from 'sharp'` tingkat atas — bila pemuatan itu
+ * gagal, modulnya mati sebelum handler sempat berjalan, dan semua
+ * unggahan gambar gagal tanpa pesan yang berguna.
+ */
+type SharpMod = typeof import('sharp');
+let _sharp: SharpMod | null = null;
+async function muatSharp(): Promise<SharpMod> {
+  if (!_sharp) _sharp = (await import('sharp')).default as unknown as SharpMod;
+  return _sharp;
+}
 
 export const prerender = false;
 
@@ -91,6 +104,22 @@ export async function POST({ request }) {
     return json(
       { error: `Gambar terlalu besar (${Math.round(raw.length / 1e6)} MB). Maksimal 12 MB.` },
       413
+    );
+  }
+
+  // Pemuat gambar: kegagalan di sini harus menjelaskan dirinya sendiri.
+  let sharp: SharpMod;
+  try {
+    sharp = await muatSharp();
+  } catch (e) {
+    return json(
+      {
+        error:
+          'Pengolah gambar tidak tersedia di server ini. Unggahan dibatalkan, ' +
+          'tetapi artikel tetap bisa disimpan dengan gambar yang sudah ada.',
+        detail: (e as Error).message,
+      },
+      503
     );
   }
 
@@ -169,6 +198,14 @@ export async function POST({ request }) {
       originalHeight: meta.height,
     });
   } catch (e) {
-    return json({ error: `Gagal memproses gambar: ${e.message}` }, 500);
+    const msg = (e as Error).message || 'penyebab tidak diketahui';
+    return json(
+      {
+        error:
+          `Gambar tidak bisa diproses (${msg}). Coba berkas JPG/PNG lain, ` +
+          'atau simpan artikel tanpa mengganti gambar.',
+      },
+      500
+    );
   }
 }

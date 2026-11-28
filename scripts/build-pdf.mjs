@@ -615,7 +615,13 @@ async function buildMediaKit(data) {
   y += 20;
 
   (rubrik || []).forEach((r) => {
-    const count = (articles || []).filter((a) => a.rubrik === r.name).length;
+    /* Artikel menyimpan SLUG rubrik ("kronik"); daftar rubrik memakai
+       nama tampil ("Kronik"). Versi lama membandingkan keduanya apa
+       adanya, sehingga setiap rubrik tercetak "0 tulisan". */
+    const kunci = (v) => String(v || '').toLowerCase().trim();
+    const count = (articles || []).filter(
+      (a) => kunci(a.rubrik) === kunci(r.slug) || kunci(a.rubrik) === kunci(r.name)
+    ).length;
     doc.font('sans').fontSize(7).fillColor(C.goldLight)
       .text(r.index, M, y + 2, { lineBreak: false });
     doc.font('bold').fontSize(11).fillColor(C.ink)
